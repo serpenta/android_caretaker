@@ -1,0 +1,15 @@
+{
+  "name": "andogarniacz",
+  "version": "0.1.0",
+  "description": "tool do ogarniania urządzeń Android za pomocą komend ADB",
+  "main": "app.js",
+  "scripts": {
+    "test_main": "node ./tests/main.js"
+  },
+  "dependencies": {
+    "node-cmd": "^3.0.0"
+  },
+  "devDependencies": {},
+  "author": "arutkiewicz",
+  "license": "Copyright Artifex Mundi"
+}
