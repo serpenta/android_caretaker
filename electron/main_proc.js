@@ -13,7 +13,7 @@ const createWindow = () =>
         }
     });
 
-    win.loadFile('./windows/index.html');
+    win.loadFile(path.resolve('./electron/windows/main.html'));
     return null;
 }
 
