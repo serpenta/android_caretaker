@@ -11,43 +11,66 @@ function runCmd(command)
     });
 }
 
+/** basic functions */
+
 async function printDevices()
 {
-    runCmd('adb devices')
+    return runCmd('adb devices')
     .then(value => console.log(value));
 }
 
-async function deleteApp()
+async function deleteApp(deviceID)
 {
-    runCmd('adb uninstall com.artifexmundi.balefire')
-    .then(value => console.log(value));;
+    console.log(`[deleteApp]: uninstalling...`);
+
+    return runCmd(`adb -s ${deviceID} uninstall com.artifexmundi.balefire`)
+    .then(value => console.log(`[deleteApp]: ${value}`));
 }
 
-async function pushObb(filepath, obbFilename)
+async function installAPK(deviceID, filepath, apkFilename)
 {
-    runCmd(`adb push ${filepath+obbFilename} mnt/sdcard/Android/obb/com.artifexmundi.balefire/${obbFilename}`)
-    .then(value => console.log(value));;
+    console.log(`[installAPK]: installing... ${apkFilename}`);
+
+    return runCmd(`adb -s ${deviceID} install ${filepath+apkFilename}`)
+    .then(value => console.log(`[installAPK]: ${value}`));
 }
 
-async function installApp(filepath, apkFilename, obbFilename)
+async function pushOBB(deviceID, filepath, obbFilename)
+{   
+    console.log(`[pushOBB]: pushing... ${obbFilename}`);
+
+    return runCmd(`adb -s ${deviceID} push ${filepath+obbFilename} mnt/sdcard/Android/obb/com.artifexmundi.balefire/${obbFilename}`)
+    .then(value => console.log(`[pushOBB]: ${value}`));
+}
+
+/** procedures */
+
+async function installApp(deviceID, filepath, apkFilename, obbFilename)
 {
-    console.log(`[installApp]: installing... ${apkFilename}`);
-    await runCmd(`adb install ${filepath+apkFilename}`)
-    .then(value => console.log(value));;
+    await installAPK(deviceID, filepath, apkFilename);
 
     console.log(`[installApp]: creating obb directory...`);
-    await runCmd(`adb shell "mkdir mnt/sdcard/Android/obb/com.artifexmundi.balefire`)
-    .then(value => console.log(value));;
-
-    console.log(`[installApp]: pushing... ${obbFilename}`);
-    await pushObb(filepath, obbFilename)
-    .then(value => console.log(value));;
-
-    console.log(`[installApp]: app installed!`);
+    await runCmd(`adb -s ${deviceID} shell "mkdir mnt/sdcard/Android/obb/com.artifexmundi.balefire`)
+    .then(value => console.log(value));
+    
+    await pushOBB(deviceID, filepath, obbFilename)
+    .then(value => console.log(value));
 }
 
-printDevices();
+async function deployApp(deviceID)
+{
+    await printDevices();
 
-// deleteApp();
+    console.log(`[deployApp]: deploying build to ${deviceID}`);
 
-installApp("C:\\Users\\Serpenta\\Downloads\\baldbound\\", "Bladebound_ftr-cached_dependencies(12098)-Debug.apk", "main.12098.com.artifexmundi.balefire.obb");
+    await deleteApp(deviceID);
+    
+    await installApp(deviceID, "C:\\Users\\Serpenta\\Downloads\\baldbound\\", "Bladebound_ftr-new_boss_challenge(12199)-Debug.apk", "main.12199.com.artifexmundi.balefire.obb");
+
+    console.log(`[deployApp]: build deployed!`);
+}
+
+deployApp("FFY5T17C21001655");
+
+// FFY5T17C21001655 - Huawei
+// bc5afd11 - Xiaomi
