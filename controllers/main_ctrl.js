@@ -57,7 +57,7 @@ async function installApp(deviceID, filepath, apkFilename, obbFilename)
     .then(value => console.log(value));
 }
 
-async function deployApp(deviceID)
+async function deployApp(deviceID, filepath, apkFilename, obbFilename)
 {
     await printDevices();
 
@@ -65,12 +65,11 @@ async function deployApp(deviceID)
 
     await deleteApp(deviceID);
     
-    await installApp(deviceID, "C:\\Users\\Serpenta\\Downloads\\baldbound\\", "Bladebound_ftr-new_boss_challenge(12199)-Debug.apk", "main.12199.com.artifexmundi.balefire.obb");
+    await installApp(deviceID, filepath, apkFilename, obbFilename);
 
     console.log(`[deployApp]: build deployed!`);
 }
 
-deployApp("FFY5T17C21001655");
-
-// FFY5T17C21001655 - Huawei
-// bc5afd11 - Xiaomi
+module.exports = {
+    deployApp
+};
