@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>QA Scripts</title>
+    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" type="text/css" href="../css/index.css" />
+  </head>
+  <body>
+    <h1>Android Caretaker</h1>
+    We are using node <script>document.write(process.versions.node)</script>,
+    Chrome <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>.
+    <div class="feature-control">
+
+      <div class="feature-control_setup">
+        <h3>Setup</h3>
+        <input type="text" class="feature-control__group-form--input-text" id="device-id" placeholder="device ID">
+        <input type="text" class="feature-control__group-form--input-text" id="file-abs-path" placeholder="absolute filepath">
+      </div>
+
+      <div class="2-column">
+
+        <h3>Non-persistent device use (1 device connected)</h3>
+        <div class="feature-control__group-forms">
+
+          <form class="feature-control__group-form">
+            <h4>Print devices to console</h4>
+            <button class="btn btn-primary" id="print-conn-devices">Print</button>
+          </form>
+
+          <form class="feature-control__group-form">
+            <h4>Install game app</h4>
+            <div class="feature-control__group-form--inputs">
+              <input type="text" class="feature-control__group-form--input-text" id="apk-filename" placeholder="APK filename">
+              <input type="text" class="feature-control__group-form--input-text" id="obb-filename" placeholder="OBB filename">
+            </div>
+            <button class="btn btn-primary" id="install-app">Install</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="../views/main_view.js"></script>
+  </body>
+</html>
