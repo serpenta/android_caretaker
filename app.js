@@ -1,6 +1,6 @@
 const { app, ipcMain, BrowserWindow } = require('electron');
 
-const controller = require('./controllers/main_ctrl');
+const cmdController = require('./controllers/cmd_ctrl');
 const path = require('path');
 
 const createWindow = () =>
@@ -21,6 +21,19 @@ const createWindow = () =>
 app.on('ready', createWindow);
 app.on('window-all-closed', () => app.quit());
 
+async function deployApp(deviceID, filepath, apkFilename, obbFilename)
+{
+    await cmdController.getDevices();
+
+    console.log(`[deployApp]: deploying build to ${deviceID}`);
+
+    await cmdController.deleteApp(deviceID);
+    
+    await cmdController.installApp(deviceID, filepath, apkFilename, obbFilename);
+
+    console.log(`[deployApp]: build deployed!`);
+}
+
 ipcMain.on('btn-install-app', (e, deviceID, filepath, apkName, obbName) => {
-    controller.deployApp(deviceID, filepath, apkName, obbName);
+    deployApp(deviceID, filepath, apkName, obbName);
 });
