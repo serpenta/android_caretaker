@@ -19,41 +19,41 @@ async function getDevices()
     .then(value => console.log(value));
 }
 
-async function deleteApp(deviceID)
+async function deleteApp(deviceIdString)
 {
     console.log(`[deleteApp]: uninstalling...`);
 
-    return runCmd(`adb -s ${deviceID} uninstall com.artifexmundi.balefire`)
+    return runCmd(`adb ${deviceIdString} uninstall com.artifexmundi.balefire`)
     .then(value => console.log(`[deleteApp]: ${value}`));
 }
 
-async function installAPK(deviceID, filepath, apkFilename)
+async function installAPK(deviceIdString, filepath, apkFilename)
 {
     console.log(`[installAPK]: installing... ${apkFilename}`);
 
-    return runCmd(`adb -s ${deviceID} install ${filepath+apkFilename}`)
+    return runCmd(`adb ${deviceIdString} install ${filepath+apkFilename}`)
     .then(value => console.log(`[installAPK]: ${value}`));
 }
 
-async function pushOBB(deviceID, filepath, obbFilename)
+async function pushOBB(deviceIdString, filepath, obbFilename)
 {   
     console.log(`[pushOBB]: pushing... ${obbFilename}`);
 
-    return runCmd(`adb -s ${deviceID} push ${filepath+obbFilename} mnt/sdcard/Android/obb/com.artifexmundi.balefire/${obbFilename}`)
+    return runCmd(`adb ${deviceIdString} push ${filepath+obbFilename} mnt/sdcard/Android/obb/com.artifexmundi.balefire/${obbFilename}`)
     .then(value => console.log(`[pushOBB]: ${value}`));
 }
 
 /** procedures */
 
-async function installApp(deviceID, filepath, apkFilename, obbFilename)
+async function installApp(deviceIdString, filepath, apkFilename, obbFilename)
 {
-    await installAPK(deviceID, filepath, apkFilename);
+    await installAPK(deviceIdString, filepath, apkFilename);
 
     console.log(`[installApp]: creating obb directory...`);
-    await runCmd(`adb -s ${deviceID} shell "mkdir mnt/sdcard/Android/obb/com.artifexmundi.balefire`)
+    await runCmd(`adb ${deviceIdString} shell "mkdir mnt/sdcard/Android/obb/com.artifexmundi.balefire`)
     .then(value => console.log(value));
     
-    await pushOBB(deviceID, filepath, obbFilename)
+    await pushOBB(deviceIdString, filepath, obbFilename)
     .then(value => console.log(value));
 }
 

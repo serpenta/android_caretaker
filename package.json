@@ -4,7 +4,7 @@
   "description": "tool do ogarniania urządzeń Android za pomocą komend ADB",
   "main": "app.js",
   "scripts": {
-    "test_main": "node ./tests/test_main.js",
+    "test_main": "node ./tests/deployApp_test.js",
     "run_app": "electron ./app.js",
     "package": "electron-builder --dir",
     "distribute": "electron-builder"
