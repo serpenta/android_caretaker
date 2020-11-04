@@ -4,15 +4,11 @@ const cmdController = require(path.resolve('./controllers/cmd_ctrl.js'));
 async function deployApp(deviceID, filepath, apkFilename, obbFilename)
 {
     const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
-
     await cmdController.getDevices();
-
     console.log(`[deployApp]: deploying build to ${deviceID}`);
 
     await cmdController.deleteApp(deviceIdString);
-    
     await cmdController.installApp(deviceIdString, filepath, apkFilename, obbFilename);
-
     console.log(`[deployApp]: build deployed!`);
 }
 
