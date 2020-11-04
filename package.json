@@ -17,11 +17,11 @@
     "electron-builder": "^22.7.0"
   },
   "build": {
-    "appId": "com.am.android-caretaker",
+    "appId": "com.ar.android-caretaker",
     "productName": "Android Caretaker",
     "copyright": "Copyright © 2020 Adrian Rutkiewicz",
     "directories": {
-      "output": "./build"
+      "output": "./build/${version}"
     }
   },
   "author": "arutkiewicz",
