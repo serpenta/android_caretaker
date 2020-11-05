@@ -2,51 +2,51 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>QA Scripts</title>
+    <title>Android Caretaker</title>
     <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-    <link rel="stylesheet" type="text/css" href="../css/index.css" />
+    <link rel="stylesheet" type="text/css" href="../css/main_window.css" />
   </head>
   <body>
     <h1>Android Caretaker</h1>
     We are using node <script>document.write(process.versions.node)</script>,
     Chrome <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.
+    
+    <div class="feature-setup">
+      <h3>Setup</h3>
+      <form class="feature-setup__form">
+        <input type="text" class="feature-setup__group-form--input-text" id="device-id" placeholder="device ID">
+        <input type="text" class="feature-setup__group-form--input-text" id="package-name" placeholder="package name">
+        <input type="text" class="feature-setup__group-form--input-text" id="file-abs-path" placeholder="absolute filepath">
+      </form>
+    </div>
+
     <div class="feature-control">
+      <h3>Functions control</h3>
+      <div class="feature-control__group-forms">
+        <div class="feature-control__group-form">
+          <button class="btn btn-primary" id="btn_print-conn-devices">Connected devices</button>
+          <label>Print connected devices</label>
+        </div>
 
-      <div class="feature-control_setup">
-        <h3>Setup</h3>
-        <input type="text" class="feature-control__group-form--input-text" id="device-id" placeholder="device ID">
-        <input type="text" class="feature-control__group-form--input-text" id="package-name" placeholder="package name">
-        <input type="text" class="feature-control__group-form--input-text" id="file-abs-path" placeholder="absolute filepath">
-      </div>
+        <div class="feature-control__group-form">
+          <button class="btn btn-primary" id="btn_print-package-version">Package version</button>
+          <label>Print package version</label>
+          <label id="package-version_display"></label>
+        </div>
 
-      <div class="2-column">
-
-        <h3>Functions control</h3>
-        <div class="feature-control__group-forms">
-          <form class="feature-control__group-form">
-            <button class="btn btn-primary" id="btn_print-conn-devices">Connected devices</button>
-            <label>Print connected devices</label>
+        <div class="feature-control__group-form">
+          <h4>Install game app</h4>
+          <form class="feature-control__group-form--inputs">
+            <input type="text" class="feature-control__group-form--input-text" id="apk-filename" placeholder="APK filename">
+            <input type="text" class="feature-control__group-form--input-text" id="obb-filename" placeholder="OBB filename">
           </form>
-
-          <form class="feature-control__group-form">
-            <button class="btn btn-primary" id="btn_print-package-version">Package version</button>
-            <label>Print package version</label>
-          </form>
-
-          <form class="feature-control__group-form">
-            <h4>Install game app</h4>
-            <div class="feature-control__group-form--inputs">
-              <input type="text" class="feature-control__group-form--input-text" id="apk-filename" placeholder="APK filename">
-              <input type="text" class="feature-control__group-form--input-text" id="obb-filename" placeholder="OBB filename">
-            </div>
-            <button class="btn btn-primary" id="btn_install-app">Install</button>
-          </form>
-
+          <button class="btn btn-primary" id="btn_install-app">Install</button>
         </div>
       </div>
     </div>
+    
     <script type="text/javascript" src="../views/main_view.js"></script>
   </body>
 </html>
