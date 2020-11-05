@@ -1,6 +1,6 @@
 {
   "name": "andogarniacz",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "tool do ogarniania urządzeń Android za pomocą komend ADB",
   "main": "app.js",
   "scripts": {
@@ -10,10 +10,9 @@
     "distribute": "electron-builder"
   },
   "dependencies": {
-
+    "electron": "^10.1.5"
   },
   "devDependencies": {
-    "electron": "^8.1.1",
     "electron-builder": "^22.7.0"
   },
   "build": {
