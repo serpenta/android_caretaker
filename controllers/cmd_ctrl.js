@@ -19,11 +19,17 @@ async function getDevices()
     .then(value => console.log(value));
 }
 
-async function deleteApp(deviceIdString)
+async function getPackageVersion(deviceIdString, packageName)
+{
+    return runCmd(`adb ${deviceIdString} shell "dumpsys package ${packageName} | grep version"`)
+    .then(value => console.log(`[appVersion]: ${value}`));
+}
+
+async function deleteApp(deviceIdString, packageName)
 {
     console.log(`[deleteApp]: uninstalling...`);
 
-    return runCmd(`adb ${deviceIdString} uninstall com.artifexmundi.balefire`)
+    return runCmd(`adb ${deviceIdString} uninstall ${packageName}`)
     .then(value => console.log(`[deleteApp]: ${value}`));
 }
 
@@ -59,6 +65,7 @@ async function installApp(deviceIdString, filepath, apkFilename, obbFilename)
 
 module.exports = {
     getDevices,
+    getPackageVersion,
     deleteApp,
     installAPK,
     installApp,

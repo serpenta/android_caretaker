@@ -17,17 +17,22 @@
       <div class="feature-control_setup">
         <h3>Setup</h3>
         <input type="text" class="feature-control__group-form--input-text" id="device-id" placeholder="device ID">
+        <input type="text" class="feature-control__group-form--input-text" id="package-name" placeholder="package name">
         <input type="text" class="feature-control__group-form--input-text" id="file-abs-path" placeholder="absolute filepath">
       </div>
 
       <div class="2-column">
 
-        <h3>Non-persistent device use (1 device connected)</h3>
+        <h3>Functions control</h3>
         <div class="feature-control__group-forms">
+          <form class="feature-control__group-form">
+            <button class="btn btn-primary" id="btn_print-conn-devices">Connected devices</button>
+            <label>Print connected devices</label>
+          </form>
 
           <form class="feature-control__group-form">
-            <h4>Print devices to console</h4>
-            <button class="btn btn-primary" id="print-conn-devices">Print</button>
+            <button class="btn btn-primary" id="btn_print-package-version">Package version</button>
+            <label>Print package version</label>
           </form>
 
           <form class="feature-control__group-form">
@@ -36,7 +41,7 @@
               <input type="text" class="feature-control__group-form--input-text" id="apk-filename" placeholder="APK filename">
               <input type="text" class="feature-control__group-form--input-text" id="obb-filename" placeholder="OBB filename">
             </div>
-            <button class="btn btn-primary" id="install-app">Install</button>
+            <button class="btn btn-primary" id="btn_install-app">Install</button>
           </form>
 
         </div>
