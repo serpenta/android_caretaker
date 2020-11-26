@@ -16,7 +16,13 @@
     <div class="feature-setup">
       <h3>Setup</h3>
       <form class="feature-setup__form">
-        <input type="text" class="feature-setup__group-form--input-text" id="device-id" placeholder="device ID">
+        <button class="btn btn-primary" id="btn_print-conn-devices">Connected devices</button>
+        <label>Print connected devices</label>
+        <select class="feature-setup__input-select" id="device-id">
+          <option value="">Don't specify</option>
+          <option value="FFY5T17C21001655">Huawei Mate 10 Lite</option>
+          <option value="RF8NA2PJ51Y">Samsung M51</option>
+        </select>
         <input type="text" class="feature-setup__group-form--input-text" id="package-name" placeholder="package name">
         <input type="text" class="feature-setup__group-form--input-text" id="file-abs-path" placeholder="absolute filepath">
       </form>
@@ -25,11 +31,6 @@
     <div class="feature-control">
       <h3>Functions control</h3>
       <div class="feature-control__group-forms">
-        <div class="feature-control__group-form">
-          <button class="btn btn-primary" id="btn_print-conn-devices">Connected devices</button>
-          <label>Print connected devices</label>
-        </div>
-
         <div class="feature-control__group-form">
           <button class="btn btn-primary" id="btn_print-package-version">Package version</button>
           <label>Print package version</label>
