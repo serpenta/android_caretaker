@@ -2,13 +2,19 @@ const { ipcRenderer } = require('electron');
 
 const utils = require('../common/utilities');
 
+function getAbsFilepath () {
+    const path = utils.getInput('file-abs-path');
+    const pathSafe = path.charAt(path.length-1) === '\\' ? path : path+'\\';
+    return pathSafe;
+}
+
 document
     .getElementById('btn_install-app')
     .addEventListener('click', () => {
         ipcRenderer.send('install-app',
             utils.getInput('device-id'),
             utils.getInput('package-name'),
-            utils.getInput('file-abs-path'),
+            getAbsFilepath(),
             utils.getInput('apk-filename'),
             utils.getInput('obb-filename'));
     });
