@@ -29,7 +29,7 @@ document
     .getElementById('btn_print-package-version')
     .addEventListener('click', () => {
         ipcRenderer.send('print-package-version',
-            utils.getInput('device-id'),
+            utils.getInput('device-id-select'),
             utils.getInput('package-name'));
     });
 
@@ -40,6 +40,6 @@ ipcRenderer.on('display-conn-devices', (e, devicesToDisplay) => {
     });
 });
 
-ipcRenderer.on('print-package-version', (e) => {
-    document.getElementById('package-version_display').innerHTML = 'version';
+ipcRenderer.on('print-package-version', (e, versionName) => {
+    document.getElementById('package-version_display').innerHTML = versionName;
 });

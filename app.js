@@ -34,8 +34,8 @@ ipcMain.on('scan-conn-devices', async (event) => {
     event.sender.send('display-conn-devices', devicesToDisplay);
 });
 
-ipcMain.on('print-package-version', (event, deviceID, packageName) => {
+ipcMain.on('print-package-version', async (event, deviceID, packageName) => {
     const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
-    cmdController.getPackageVersion(deviceIdString, packageName);
-    event.sender.send('print-package-version');
+    const versionName = await cmdController.getVersionName(deviceIdString, packageName);
+    event.sender.send('print-package-version', versionName);
 });
