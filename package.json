@@ -1,11 +1,10 @@
 {
-  "name": "andogarniacz",
+  "name": "andcare",
   "version": "0.2.0",
   "description": "tool do ogarniania urządzeń Android za pomocą komend ADB",
   "main": "app.js",
   "scripts": {
-    "test_main": "node ./tests/deployApp_test.js",
-    "test_device": "node ./tests/scanDevices_test.js",
+    "run_selected_test": "node ./tests/test_switcher.js",
     "run_app": "electron ./app.js",
     "package": "electron-builder --dir",
     "distribute": "electron-builder"
@@ -17,13 +16,13 @@
     "electron-builder": "^22.7.0"
   },
   "build": {
-    "appId": "com.ar.android-caretaker",
+    "appId": "com.ar.andcare",
     "productName": "Android Caretaker",
     "copyright": "Copyright © 2020 Adrian Rutkiewicz",
     "directories": {
       "output": "./build/${version}"
     }
   },
-  "author": "arutkiewicz",
-  "license": "Copyright Adrian Rutkiewicz"
+  "author": "Adrian Rutkiewicz",
+  "license": "MIT"
 }
