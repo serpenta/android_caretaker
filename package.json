@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test_main": "node ./tests/deployApp_test.js",
+    "test_device": "node ./tests/scanDevices_test.js",
     "run_app": "electron ./app.js",
     "package": "electron-builder --dir",
     "distribute": "electron-builder"
