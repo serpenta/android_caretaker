@@ -14,6 +14,15 @@ app.on('ready', () => {
     });
 
     win.loadFile('./windows/main_window.html');
+    win.webContents.on('did-finish-load', async (event) => {
+        const detectedDevices = await cmdController.scanDevices();
+        const devicesToDisplay = ['<option disabled>- Detected Devices -</option>'];
+        detectedDevices.forEach(device => {
+            devicesToDisplay.push(`<option value="${device}">${device}</option>`);
+            ProgramState.pushDeviceID(device);
+        });
+        event.sender.send('display-conn-devices', devicesToDisplay);
+    });
 });
 
 app.on('window-all-closed', () => app.quit());
@@ -26,7 +35,7 @@ ipcMain.on('install-app', async (e, deviceID, packageName, filepath, apkFilename
 
 ipcMain.on('scan-conn-devices', async (event) => {
     const detectedDevices = await cmdController.scanDevices();
-    const devicesToDisplay = ['<option value="">Don\'t specify</option>', '<option disabled>- Detected -</option>'];
+    const devicesToDisplay = ['<option disabled>- Detected Devices -</option>'];
     detectedDevices.forEach(device => {
         devicesToDisplay.push(`<option value="${device}">${device}</option>`);
         ProgramState.pushDeviceID(device);
