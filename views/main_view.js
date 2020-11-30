@@ -41,5 +41,5 @@ ipcRenderer.on('display-conn-devices', (e, devicesToDisplay) => {
 });
 
 ipcRenderer.on('print-package-version', (e, versionName) => {
-    document.getElementById('package-version_display').innerHTML = versionName;
+    document.getElementById('package-version_display').value = versionName.slice(versionName.indexOf("=")+1);
 });
