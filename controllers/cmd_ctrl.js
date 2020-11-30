@@ -12,19 +12,31 @@ function runCmd(command)
 
 /** basic functions */
 
-async function getDevices()
+async function scanDevices()
 {
-    return runCmd('adb devices')
-    .then(value => console.log(value));
+    const detectedDevices = [];
+
+    await runCmd('adb devices')
+    .then(value => {
+        const lines = value.split('\n');
+        let idx = 1;
+        while (lines[idx].length > 2) {
+            const deviceID = lines[idx].slice(0, lines[idx].indexOf("\t"));
+            detectedDevices.push(deviceID);
+            idx += 1;
+       }
+    });
+
+    return detectedDevices;
 }
 
-async function getPackageVersion(deviceIdString, packageName)
+function getPackageVersion(deviceIdString, packageName)
 {
     return runCmd(`adb ${deviceIdString} shell "dumpsys package ${packageName} | grep version"`)
     .then(value => console.log(`[appVersion]: ${value}`));
 }
 
-async function deleteApp(deviceIdString, packageName)
+function deleteApp(deviceIdString, packageName)
 {
     console.log(`[deleteApp]: uninstalling...`);
 
@@ -32,7 +44,7 @@ async function deleteApp(deviceIdString, packageName)
     .then(value => console.log(`[deleteApp]: ${value}`));
 }
 
-async function installAPK(deviceIdString, filepath, apkFilename)
+function installAPK(deviceIdString, filepath, apkFilename)
 {
     console.log(`[installAPK]: installing... ${apkFilename}`);
 
@@ -40,7 +52,7 @@ async function installAPK(deviceIdString, filepath, apkFilename)
     .then(value => console.log(`[installAPK]: ${value}`));
 }
 
-async function pushOBB(deviceIdString, filepath, obbFilename)
+function pushOBB(deviceIdString, filepath, obbFilename)
 {   
     console.log(`[pushOBB]: pushing... ${obbFilename}`);
 
@@ -63,7 +75,7 @@ async function installApp(deviceIdString, filepath, apkFilename, obbFilename)
 }
 
 module.exports = {
-    getDevices,
+    scanDevices,
     getPackageVersion,
     deleteApp,
     installAPK,
