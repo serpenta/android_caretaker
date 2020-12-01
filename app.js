@@ -27,10 +27,24 @@ app.on('ready', () => {
 
 app.on('window-all-closed', () => app.quit());
 
-ipcMain.on('install-app', async (e, deviceID, packageName, filepath, apkFilename, obbFilename) => {
+ipcMain.on('scan-dir-packages', async (event, directory) => {
+    const apkList = await cmdController.scanDirectory(directory, ".apk");
+    const apkToDisplay = ['<option disabled>- Detected APK -</option>'];
+    apkList.forEach(file => {
+        apkToDisplay.push(`<option value="${file}">${file}</option>`);
+    });
+    const obbList = await cmdController.scanDirectory(directory, ".obb");
+    const obbToDisplay = ['<option value="">None</option>', '<option disabled>- Detected OBB -</option>'];
+    obbList.forEach(file => {
+        obbToDisplay.push(`<option value="${file}">${file}</option>`);
+    });
+    event.sender.send('display-packages', apkToDisplay, obbToDisplay);
+});
+
+ipcMain.on('install-app', async (e, deviceID, packageName, directory, apkFilename, obbFilename) => {
     const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
     await cmdController.deleteApp(deviceIdString, packageName);
-    await cmdController.installApp(deviceIdString, filepath, apkFilename, obbFilename);
+    await cmdController.installApp(deviceIdString, directory, apkFilename, obbFilename);
 });
 
 ipcMain.on('scan-conn-devices', async (event) => {

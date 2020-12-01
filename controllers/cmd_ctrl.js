@@ -12,6 +12,32 @@ function runCmd(command)
 
 /** basic functions */
 
+function deleteApp(deviceId, packageName)
+{
+    console.log(`[deleteApp]: uninstalling...`);
+
+    return runCmd(`adb ${deviceId} uninstall ${packageName}`)
+    .then(value => console.log(`[deleteApp]: ${value}`));
+}
+
+function installAPK(deviceId, directory, apkFilename)
+{
+    console.log(`[installAPK]: installing... ${apkFilename}`);
+
+    return runCmd(`adb ${deviceId} install ${directory+apkFilename}`)
+    .then(value => console.log(`[installAPK]: ${value}`));
+}
+
+function pushOBB(deviceId, directory, obbFilename)
+{   
+    console.log(`[pushOBB]: pushing... ${obbFilename}`);
+
+    return runCmd(`adb ${deviceId} push ${directory+obbFilename} mnt/sdcard/Android/obb/com.artifexmundi.balefire/${obbFilename}`)
+    .then(value => console.log(`[pushOBB]: ${value}`));
+}
+
+/** procedures */
+
 async function scanDevices()
 {
     const detectedDevices = [];
@@ -30,6 +56,35 @@ async function scanDevices()
     return detectedDevices;
 }
 
+async function scanDirectory(directory, fileExt)
+{
+    const fileList = [];
+
+    await runCmd (`dir /W /-N "${directory}"`)
+    .then(value => {
+        const lines = value.split('\n');
+        lines.forEach(line => {
+            if (line.indexOf(fileExt) > 0)
+                fileList.push(line.slice(0, line.indexOf("\r")));
+        });
+        console.log(fileList);
+    });
+
+    return fileList;
+}
+
+async function installApp(deviceId, directory, apkFilename, obbFilename)
+{
+    await installAPK(deviceId, directory, apkFilename);
+
+    console.log(`[installApp]: creating obb directory...`);
+    await runCmd(`adb ${deviceId} shell "mkdir mnt/sdcard/Android/obb/com.artifexmundi.balefire`)
+    .then(value => console.log(value));
+    
+    await pushOBB(deviceId, directory, obbFilename)
+    .then(value => console.log(value));
+}
+
 async function getVersionName(deviceId, packageName)
 {
     let versionName = null;
@@ -43,46 +98,9 @@ async function getVersionName(deviceId, packageName)
     return versionName;
 }
 
-function deleteApp(deviceId, packageName)
-{
-    console.log(`[deleteApp]: uninstalling...`);
-
-    return runCmd(`adb ${deviceId} uninstall ${packageName}`)
-    .then(value => console.log(`[deleteApp]: ${value}`));
-}
-
-function installAPK(deviceId, filepath, apkFilename)
-{
-    console.log(`[installAPK]: installing... ${apkFilename}`);
-
-    return runCmd(`adb ${deviceId} install ${filepath+apkFilename}`)
-    .then(value => console.log(`[installAPK]: ${value}`));
-}
-
-function pushOBB(deviceId, filepath, obbFilename)
-{   
-    console.log(`[pushOBB]: pushing... ${obbFilename}`);
-
-    return runCmd(`adb ${deviceId} push ${filepath+obbFilename} mnt/sdcard/Android/obb/com.artifexmundi.balefire/${obbFilename}`)
-    .then(value => console.log(`[pushOBB]: ${value}`));
-}
-
-/** procedures */
-
-async function installApp(deviceId, filepath, apkFilename, obbFilename)
-{
-    await installAPK(deviceId, filepath, apkFilename);
-
-    console.log(`[installApp]: creating obb directory...`);
-    await runCmd(`adb ${deviceId} shell "mkdir mnt/sdcard/Android/obb/com.artifexmundi.balefire`)
-    .then(value => console.log(value));
-    
-    await pushOBB(deviceId, filepath, obbFilename)
-    .then(value => console.log(value));
-}
-
 module.exports = {
     scanDevices,
+    scanDirectory,
     getVersionName,
     deleteApp,
     installAPK,

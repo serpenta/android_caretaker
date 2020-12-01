@@ -2,11 +2,13 @@ const { ipcRenderer } = require('electron');
 
 const utils = require('../common/utilities');
 
-function getAbsFilepath () {
-    const path = utils.getInput('file-abs-path');
-    const pathSafe = path.charAt(path.length-1) === '\\' ? path : path+'\\';
-    return pathSafe;
-}
+
+document
+    .getElementById('btn_scan-dir-packages')
+    .addEventListener('click', () => {
+        ipcRenderer.send('scan-dir-packages',
+            utils.getAbsFilepath('file-abs-path'));
+    });
 
 document
     .getElementById('btn_install-app')
@@ -14,7 +16,7 @@ document
         ipcRenderer.send('install-app',
             utils.getInput('device-id-select'),
             utils.getInput('package-name'),
-            getAbsFilepath(),
+            utils.getAbsFilepath('file-abs-path'),
             utils.getInput('apk-filename'),
             utils.getInput('obb-filename'));
     });
@@ -32,6 +34,17 @@ document
             utils.getInput('device-id-select'),
             utils.getInput('package-name'));
     });
+
+ipcRenderer.on('display-packages', (e, apkToDisplay, obbToDisplay) => {
+    document.getElementById('apk-filename').innerHTML = "";
+    apkToDisplay.forEach(file => {
+        document.getElementById('apk-filename').insertAdjacentHTML('beforeend', file);
+    });
+    document.getElementById('obb-filename').innerHTML = "";
+    obbToDisplay.forEach(file => {
+        document.getElementById('obb-filename').insertAdjacentHTML('beforeend', file);
+    });
+});
 
 ipcRenderer.on('display-conn-devices', (e, devicesToDisplay) => {
     document.getElementById('device-id-select').innerHTML = "";
