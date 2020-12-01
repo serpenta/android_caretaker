@@ -1,6 +1,6 @@
 {
   "name": "andcare",
-  "version": "0.2.0",
+  "version": "0.1.1",
   "description": "tool do ogarniania urządzeń Android za pomocą komend ADB",
   "main": "app.js",
   "scripts": {
