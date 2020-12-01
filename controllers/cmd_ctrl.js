@@ -67,7 +67,6 @@ async function scanDirectory(directory, fileExt)
             if (line.indexOf(fileExt) > 0)
                 fileList.push(line.slice(0, line.indexOf("\r")));
         });
-        console.log(fileList);
     });
 
     return fileList;
