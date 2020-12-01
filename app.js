@@ -6,7 +6,7 @@ const { ProgramState } = require('./classes/State');
 app.on('ready', () => {
     let win = new BrowserWindow
     ({
-        width: 1280,
+        width: 900,
         height: 860,
         webPreferences: {
             nodeIntegration: true
