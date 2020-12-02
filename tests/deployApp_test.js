@@ -13,7 +13,7 @@ async function deployApp(deviceID, filepath, packageName, apkFilename, obbFilena
 }
 
 deployApp(
-    deviceID= "",
+    deviceID= "RF8NA2PJ51Y",
     filepath= "I:\\bladebound\\",
     packageName= "com.artifexmundi.balefire",
     apkFilename= "Bladebound_rel-2-11-0(12865)-Release.apk",

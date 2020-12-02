@@ -1,4 +1,4 @@
-const switcher = 'scanDirectory';
+const switcher = 'properties';
 
 switch (switcher)
 {
@@ -13,5 +13,8 @@ switch (switcher)
         break;
     case 'packageVersion':
         require('./getPackageVersion_test');
+        break;
+    case 'properties':
+        require('./properties_test');
         break;
 }
