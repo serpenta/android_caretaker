@@ -1,5 +1,6 @@
 const { app, ipcMain, BrowserWindow } = require('electron');
 
+const settings = require('./common/settings');
 const cmdController = require('./controllers/cmd_ctrl');
 const { ProgramState } = require('./classes/State');
 
@@ -61,4 +62,15 @@ ipcMain.on('print-package-version', async (event, deviceID, packageName) => {
     const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
     const versionName = await cmdController.getVersionName(deviceIdString, packageName);
     event.sender.send('print-package-version', versionName);
+});
+
+ipcMain.on('property-name-change', async (event, deviceID, propName, fieldId) => {
+    const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
+    const propValue = await cmdController.getProp(deviceIdString, propName);
+    event.sender.send('display-prop-value', propValue, settings.propertyFields[fieldId]);
+});
+
+ipcMain.on('property-value-change', (e, deviceID, propValue, propName) => {
+    const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
+    cmdController.setProp(deviceIdString, propName, propValue);
 });

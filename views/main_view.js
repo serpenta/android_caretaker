@@ -1,17 +1,15 @@
 const { ipcRenderer } = require('electron');
 
+const settings = require('../common/settings');
 const utils = require('../common/utilities');
 
-
-document
-    .getElementById('btn_scan-dir-packages')
+document.getElementById('btn_scan-dir-packages')
     .addEventListener('click', () => {
         ipcRenderer.send('scan-dir-packages',
             utils.getAbsFilepath('file-abs-path'));
     });
 
-document
-    .getElementById('btn_install-app')
+document.getElementById('btn_install-app')
     .addEventListener('click', () => {
         ipcRenderer.send('install-app',
             utils.getInput('device-id-select'),
@@ -21,19 +19,58 @@ document
             utils.getInput('obb-filename'));
     });
 
-document
-    .getElementById('btn_scan-conn-devices')
+document.getElementById('btn_scan-conn-devices')
     .addEventListener('click', () => {
         ipcRenderer.send('scan-conn-devices');
     });
 
-document
-    .getElementById('btn_print-package-version')
+document.getElementById('btn_print-package-version')
     .addEventListener('click', () => {
         ipcRenderer.send('print-package-version',
             utils.getInput('device-id-select'),
             utils.getInput('package-name'));
     });
+
+document.getElementById('device-id-select')
+    .addEventListener('change', () => {
+        Array.from(document.getElementsByClassName('feature-control_group_property-name'))
+            .forEach(element => {
+                if (element.value.length > 0)
+                {
+                    ipcRenderer.send('property-name-change',
+                    utils.getInput('device-id-select'),
+                    element.value,
+                    element.id);
+                }
+            });
+    });
+    
+Array.from(document.getElementsByClassName('feature-control_group_property-name'))
+    .forEach(element => {
+        element.addEventListener('change', (event) => {
+            ipcRenderer.send('property-name-change',
+                utils.getInput('device-id-select'),
+                event.target.value,
+                event.target.id)});
+        element.addEventListener('click', (event) => {
+            if (event.target.value.length > 0)
+            {
+                ipcRenderer.send('property-name-change',
+                utils.getInput('device-id-select'),
+                event.target.value,
+                event.target.id);
+            }
+        });
+    });
+
+Array.from(document.getElementsByClassName('feature-control_group_property-value'))
+    .forEach(element => element.addEventListener('change', (event) => {
+        const propNameFieldId = settings.propertyFields[event.target.id];
+        ipcRenderer.send('property-value-change',
+            utils.getInput('device-id-select'),
+            event.target.value,
+            utils.getInput(propNameFieldId))
+    }));
 
 ipcRenderer.on('display-packages', (e, apkToDisplay, obbToDisplay) => {
     document.getElementById('apk-filename').innerHTML = "";
@@ -55,4 +92,8 @@ ipcRenderer.on('display-conn-devices', (e, devicesToDisplay) => {
 
 ipcRenderer.on('print-package-version', (e, versionName) => {
     document.getElementById('package-version_display').value = versionName.slice(versionName.indexOf("=")+1);
+});
+
+ipcRenderer.on('display-prop-value', (e, propValue, fieldId) => {
+    document.getElementById(fieldId).value = propValue;
 });

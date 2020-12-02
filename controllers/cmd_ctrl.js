@@ -36,6 +36,14 @@ function pushOBB(deviceId, directory, obbFilename)
     .then(value => console.log(`[pushOBB]: ${value}`));
 }
 
+function setProp(deviceId, propName, propValue)
+{
+    runCmd(`adb ${deviceId} shell setprop ${propName} ${propValue}`);
+    
+    console.log(`[setProp]: property ${propName} set to ${propValue}`);
+    return null;
+}
+
 /** procedures */
 
 async function scanDevices()
@@ -97,10 +105,23 @@ async function getVersionName(deviceId, packageName)
     return versionName;
 }
 
+async function getProp(deviceId, propName)
+{
+    let propValue = null;
+
+    await runCmd(`adb ${deviceId} shell getprop ${propName}`)
+    .then(value => propValue = value);
+
+    console.log(`[getProp]: property ${propName} is set to ${propValue}`);
+    return propValue;
+}
+
 module.exports = {
     scanDevices,
     scanDirectory,
     getVersionName,
+    getProp,
+    setProp,
     deleteApp,
     installAPK,
     installApp,
