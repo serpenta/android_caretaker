@@ -44,9 +44,8 @@ ipcMain.on('scan-dir-packages', async (event, directory) => {
 });
 
 ipcMain.on('install-app', async (e, deviceID, packageName, directory, apkFilename, obbFilename) => {
-    const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
-    await cmdController.deleteApp(deviceIdString, packageName);
-    await cmdController.installApp(deviceIdString, directory, apkFilename, obbFilename);
+    await cmdController.deleteApp(utils.wrapDeviceID(deviceID), packageName);
+    await cmdController.installApp(utils.wrapDeviceID(deviceID), directory, apkFilename, obbFilename);
 });
 
 ipcMain.on('scan-conn-devices', async (event) => {
@@ -60,14 +59,12 @@ ipcMain.on('scan-conn-devices', async (event) => {
 });
 
 ipcMain.on('print-package-version', async (event, deviceID, packageName) => {
-    const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
-    const versions = await cmdController.getVersionName(deviceIdString, packageName);
+    const versions = await cmdController.getVersionName(utils.wrapDeviceID(deviceID), packageName);
     event.sender.send('print-package-version', versions.versionName, versions.versionCode);
 });
 
 ipcMain.on('save-app-logs', async (e, deviceID, packageName, fileName, pidSwitch) => {
-    const deviceIdString = deviceID.length > 0 ? `-s ${deviceID}` : deviceID;
-    const pid = pidSwitch ? await cmdController.fetchPid(deviceIdString, packageName) : null;
+    const pid = pidSwitch ? await cmdController.fetchPid(utils.wrapDeviceID(deviceID), packageName) : null;
 
     let fileNameSafe = null;
     if (fileName.length > 0)
@@ -75,21 +72,18 @@ ipcMain.on('save-app-logs', async (e, deviceID, packageName, fileName, pidSwitch
     else
         fileNameSafe = `log_${packageName}_${utils.timeStampFile()}.txt`;
 
-    cmdController.dumpLogs(deviceIdString, fileNameSafe, pid);
+    cmdController.dumpLogs(utils.wrapDeviceID(deviceID), fileNameSafe, pid);
 });
 
 ipcMain.on('clear-app-logs', (e, deviceID) => {
-    const deviceIdString = deviceID.length > 0 ? `-s ${deviceID}` : deviceID;
-    cmdController.clearLogs(deviceIdString);
+    cmdController.clearLogs(utils.wrapDeviceID(deviceID));
 });
 
 ipcMain.on('property-name-change', async (event, deviceID, propName, fieldId) => {
-    const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
-    const propValue = await cmdController.getProp(deviceIdString, propName);
+    const propValue = await cmdController.getProp(utils.wrapDeviceID(deviceID), propName);
     event.sender.send('display-prop-value', propValue, settings.propertyFields[fieldId]);
 });
 
 ipcMain.on('property-value-change', (e, deviceID, propValue, propName) => {
-    const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
-    cmdController.setProp(deviceIdString, propName, propValue);
+    cmdController.setProp(utils.wrapDeviceID(deviceID), propName, propValue);
 });

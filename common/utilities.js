@@ -1,3 +1,8 @@
+function wrapDeviceID (deviceID)
+{
+    return deviceID.length > 0 ? `-s ${deviceID}` : deviceID;
+}
+
 function timeStamp ()
 {
     return JSON.stringify(new Date()).slice(1, 20);
@@ -39,6 +44,7 @@ function getAbsFilepath (input)
 }
 
 module.exports = {
+    wrapDeviceID,
     timeStamp,
     timeStampFile,
     dateStamp,
