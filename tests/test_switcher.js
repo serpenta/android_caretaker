@@ -1,4 +1,4 @@
-const switcher = 'properties';
+const switcher = 'dumpLogs';
 
 switch (switcher)
 {
@@ -16,5 +16,8 @@ switch (switcher)
         break;
     case 'properties':
         require('./properties_test');
+        break;
+    case 'dumpLogs':
+        require('./dumpLogs_test');
         break;
 }

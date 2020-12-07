@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Scan Devices",
+            "name": "Run test",
             "skipFiles": [
                 "<node_internals>/**"
             ],
