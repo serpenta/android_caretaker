@@ -1,6 +1,7 @@
 const { app, ipcMain, BrowserWindow } = require('electron');
 
 const settings = require('./common/settings');
+const utils = require('./common/utilities');
 const cmdController = require('./controllers/cmd_ctrl');
 const { ProgramState } = require('./classes/State');
 
@@ -8,7 +9,7 @@ app.on('ready', () => {
     let win = new BrowserWindow
     ({
         width: 900,
-        height: 860,
+        height: 1000,
         webPreferences: {
             nodeIntegration: true
         }
@@ -60,8 +61,26 @@ ipcMain.on('scan-conn-devices', async (event) => {
 
 ipcMain.on('print-package-version', async (event, deviceID, packageName) => {
     const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
-    const versionName = await cmdController.getVersionName(deviceIdString, packageName);
-    event.sender.send('print-package-version', versionName);
+    const versions = await cmdController.getVersionName(deviceIdString, packageName);
+    event.sender.send('print-package-version', versions.versionName, versions.versionCode);
+});
+
+ipcMain.on('save-app-logs', async (e, deviceID, packageName, fileName, pidSwitch) => {
+    const deviceIdString = deviceID.length > 0 ? `-s ${deviceID}` : deviceID;
+    const pid = pidSwitch ? await cmdController.fetchPid(deviceIdString, packageName) : null;
+
+    let fileNameSafe = null;
+    if (fileName.length > 0)
+        fileNameSafe = fileName.slice(fileName.length-4).match(/(\.[a-z]{3}$)/) === null ? fileName+".txt" : fileName;
+    else
+        fileNameSafe = `log_${packageName}_${utils.timeStampFile()}.txt`;
+
+    cmdController.dumpLogs(deviceIdString, fileNameSafe, pid);
+});
+
+ipcMain.on('clear-app-logs', (e, deviceID) => {
+    const deviceIdString = deviceID.length > 0 ? `-s ${deviceID}` : deviceID;
+    cmdController.clearLogs(deviceIdString);
 });
 
 ipcMain.on('property-name-change', async (event, deviceID, propName, fieldId) => {

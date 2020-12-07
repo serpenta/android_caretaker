@@ -10,6 +10,7 @@ function runCmd(command)
     });
 }
 
+
 /** basic functions */
 
 function deleteApp(deviceId, packageName)
@@ -43,6 +44,14 @@ function setProp(deviceId, propName, propValue)
     console.log(`[setProp]: property ${propName} set to ${propValue}`);
     return null;
 }
+
+function clearLogs (deviceId)
+{
+    runCmd(`adb ${deviceId} logcat --clear`);
+    console.log(`[clearLogs]: log cleared!`);
+    return null;
+}
+
 
 /** procedures */
 
@@ -95,14 +104,45 @@ async function installApp(deviceId, directory, apkFilename, obbFilename)
 async function getVersionName(deviceId, packageName)
 {
     let versionName = null;
+    let versionCode = null;
 
     await runCmd(`adb ${deviceId} shell "dumpsys package ${packageName} | grep version"`)
     .then(value => {
         const lines = value.split("\n");
-        versionName = lines[1].slice(lines[1].indexOf('versionName'));
+        versionCode = lines[0].slice(lines[0].indexOf('versionCode'), lines[0].indexOf('minSdk')-1);
+        versionName = lines[1].slice(lines[1].indexOf('versionName'), lines[1].indexOf('\r'));
     });
 
-    return versionName;
+    return {
+        versionName,
+        versionCode
+    };
+}
+
+async function fetchPid(deviceId, packageName)
+{
+    let pid = null;
+
+    await runCmd(`adb ${deviceId} shell "ps | grep ${packageName}`)
+    .then(value => {
+        const matchPid = value.match(/(\s\d+\s)/);
+        pid = matchPid[0].slice(1, matchPid[0].length-1);
+        console.log(`[fetchPit]: ${pid}`);
+    });
+        
+    return pid;
+}
+
+async function dumpLogs (deviceId, fileName, pid)
+{
+    if (pid !== null)
+        await runCmd(`adb ${deviceId} logcat -d -f mnt/sdcard/Download/${fileName} --pid=${pid}`);
+    else
+        await runCmd(`adb ${deviceId} logcat -d -f mnt/sdcard/Download/${fileName}`);
+    console.log(`[dumpLogs]: log ${fileName} dumped at mnt/sdcard/Download`);
+    runCmd(`adb ${deviceId} pull "mnt/sdcard/Download/${fileName}" "./logs/${fileName}"`)
+    console.log(`[dumpLogs]: log ${fileName} pulled to ./logs/`);
+    return null;
 }
 
 async function getProp(deviceId, propName)
@@ -125,4 +165,7 @@ module.exports = {
     deleteApp,
     installAPK,
     installApp,
+    dumpLogs,
+    clearLogs,
+    fetchPid,
 };

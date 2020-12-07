@@ -31,6 +31,21 @@ document.getElementById('btn_print-package-version')
             utils.getInput('package-name'));
     });
 
+document.getElementById('btn_save-logs')
+    .addEventListener('click', () => {
+        ipcRenderer.send('save-app-logs',
+            utils.getInput('device-id-select'),
+            utils.getInput('package-name'),
+            utils.getInput('logs-target-name'),
+            utils.getCheckbox('logs-pid-filter'));
+    });
+
+document.getElementById('btn_clear-logs')
+    .addEventListener('click', () => {
+        ipcRenderer.send('clear-app-logs',
+            utils.getInput('device-id-select'));
+    });
+
 document.getElementById('device-id-select')
     .addEventListener('change', () => {
         Array.from(document.getElementsByClassName('feature-control_group_property-name'))
@@ -90,8 +105,9 @@ ipcRenderer.on('display-conn-devices', (e, devicesToDisplay) => {
     });
 });
 
-ipcRenderer.on('print-package-version', (e, versionName) => {
-    document.getElementById('package-version_display').value = versionName.slice(versionName.indexOf("=")+1);
+ipcRenderer.on('print-package-version', (e, versionName, versionCode) => {
+    document.getElementById('package-version-code_display').value = versionCode.slice(versionCode.indexOf("=")+1);
+    document.getElementById('package-version-name_display').value = versionName.slice(versionName.indexOf("=")+1);
 });
 
 ipcRenderer.on('display-prop-value', (e, propValue, fieldId) => {

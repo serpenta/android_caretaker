@@ -1,7 +1,15 @@
+body {
+    width: 600px;
+}
+
 .feature-control_group_property-name {
     width: 270px;
 }
 
 .feature-control_group_property-value {
     width: 84px;
+}
+
+.feature-control_group_property {
+    margin-bottom: 2px;
 }
