@@ -1,3 +1,18 @@
+function timeStamp ()
+{
+    return JSON.stringify(new Date()).slice(1, 20);
+}
+
+function timeStampFile ()
+{
+    return JSON.stringify(new Date()).slice(1, 20).replace(/:/g, "-");
+}
+
+function dateStamp ()
+{
+    return JSON.stringify(new Date()).slice(1, 11);
+}
+
 function getRadio (radioName)
 {
     const radio = document.getElementsByName(radioName);
@@ -24,6 +39,9 @@ function getAbsFilepath (input)
 }
 
 module.exports = {
+    timeStamp,
+    timeStampFile,
+    dateStamp,
     getRadio,
     getCheckbox,
     getInput,
