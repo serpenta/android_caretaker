@@ -1,5 +1,18 @@
 body {
-    width: 600px;
+    width: 900px;
+}
+
+.row {
+    overflow: auto;
+}
+
+.col-2 {
+    width: 50%;
+    float: left;
+}
+
+.app-log_container {
+    padding-top: 20px;
 }
 
 .feature-control_group_property-name {

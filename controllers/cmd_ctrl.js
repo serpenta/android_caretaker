@@ -1,4 +1,5 @@
 const childProcess = require('child_process');
+const { ProgramState } = require('../classes/State');
 
 function runCmd(command)
 {
@@ -13,50 +14,50 @@ function runCmd(command)
 
 /** basic functions */
 
-function deleteApp(deviceId, packageName)
+function deleteApp(event, deviceId, packageName)
 {
-    console.log(`[deleteApp]: uninstalling...`);
+    event.sender.send('app-log-print', `[deleteApp]: uninstalling...`);
 
     return runCmd(`adb ${deviceId} uninstall ${packageName}`)
-    .then(value => console.log(`[deleteApp]: ${value}`));
+    .then(value => event.sender.send('app-log-print', `[deleteApp]: ${value}`));
 }
 
-function installAPK(deviceId, directory, apkFilename)
+function installAPK(event, deviceId, directory, apkFilename)
 {
-    console.log(`[installAPK]: installing... ${apkFilename}`);
+    event.sender.send('app-log-print', `[installAPK]: installing... ${apkFilename}`);
 
     return runCmd(`adb ${deviceId} install ${directory+apkFilename}`)
-    .then(value => console.log(`[installAPK]: ${value}`));
+    .then(value => event.sender.send('app-log-print', `[installAPK]: ${value}`));
 }
 
-function pushOBB(deviceId, directory, obbFilename)
+function pushOBB(event, deviceId, directory, obbFilename)
 {   
-    console.log(`[pushOBB]: pushing... ${obbFilename}`);
+    event.sender.send('app-log-print', `[pushOBB]: pushing... ${obbFilename}`);
 
     return runCmd(`adb ${deviceId} push ${directory+obbFilename} mnt/sdcard/Android/obb/com.artifexmundi.balefire/${obbFilename}`)
-    .then(value => console.log(`[pushOBB]: ${value}`));
+    .then(value => event.sender.send('app-log-print', `[pushOBB]: ${value}`));
 }
 
-function setProp(deviceId, propName, propValue)
+function setProp(event, deviceId, propName, propValue)
 {
     runCmd(`adb ${deviceId} shell setprop ${propName} ${propValue}`);
     
-    console.log(`[setProp]: property ${propName} set to ${propValue}`);
+    event.sender.send('app-log-print', `[setProp]: property ${propName} set to ${propValue}`);
     return null;
 }
 
-function clearLogs (deviceId)
+function clearLogs (event, deviceId)
 {
     runCmd(`adb ${deviceId} logcat --clear`);
-    console.log(`[clearLogs]: log cleared!`);
+    event.sender.send('app-log-print', `[clearLogs]: log cleared!`);
     return null;
 }
-
 
 /** procedures */
 
-async function scanDevices()
+async function scanDevices(event)
 {
+    event.sender.send('app-log-print', `Looking for connected devices...`);
     const detectedDevices = [];
 
     await runCmd('adb devices')
@@ -70,6 +71,7 @@ async function scanDevices()
        }
     });
 
+    event.sender.send('app-log-print', `${detectedDevices.length} connected device(s) found!`);
     return detectedDevices;
 }
 
@@ -89,16 +91,16 @@ async function scanDirectory(directory, fileExt)
     return fileList;
 }
 
-async function installApp(deviceId, directory, apkFilename, obbFilename)
+async function installApp(event, deviceId, directory, apkFilename, obbFilename)
 {
-    await installAPK(deviceId, directory, apkFilename);
+    await installAPK(event, deviceId, directory, apkFilename);
 
-    console.log(`[installApp]: creating obb directory...`);
+    event.sender.send('app-log-print', `[installApp]: creating obb directory...`);
     await runCmd(`adb ${deviceId} shell "mkdir mnt/sdcard/Android/obb/com.artifexmundi.balefire`)
-    .then(value => console.log(value));
+    .then(value => event.sender.send('app-log-print', value));
     
-    await pushOBB(deviceId, directory, obbFilename)
-    .then(value => console.log(value));
+    await pushOBB(event, deviceId, directory, obbFilename)
+    .then(value => event.sender.send('app-log-print', value));
 }
 
 async function getVersionName(deviceId, packageName)
@@ -119,7 +121,7 @@ async function getVersionName(deviceId, packageName)
     };
 }
 
-async function fetchPid(deviceId, packageName)
+async function fetchPid(event, deviceId, packageName)
 {
     let pid = null;
 
@@ -127,32 +129,32 @@ async function fetchPid(deviceId, packageName)
     .then(value => {
         const matchPid = value.match(/(\s\d+\s)/);
         pid = matchPid[0].slice(1, matchPid[0].length-1);
-        console.log(`[fetchPit]: ${pid}`);
+        event.sender.send('app-log-print', `[fetchPit]: ${pid}`);
     });
         
     return pid;
 }
 
-async function dumpLogs (deviceId, fileName, pid)
+async function dumpLogs (event, deviceId, fileName, pid)
 {
     if (pid !== null)
         await runCmd(`adb ${deviceId} logcat -d -f mnt/sdcard/Download/${fileName} --pid=${pid}`);
     else
         await runCmd(`adb ${deviceId} logcat -d -f mnt/sdcard/Download/${fileName}`);
-    console.log(`[dumpLogs]: log ${fileName} dumped at mnt/sdcard/Download`);
+    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileName}\' dumped at mnt/sdcard/Download`);
     runCmd(`adb ${deviceId} pull "mnt/sdcard/Download/${fileName}" "./logs/${fileName}"`)
-    console.log(`[dumpLogs]: log ${fileName} pulled to ./logs/`);
+    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileName}\' pulled to ./logs/`);
     return null;
 }
 
-async function getProp(deviceId, propName)
+async function getProp(event, deviceId, propName)
 {
     let propValue = null;
 
     await runCmd(`adb ${deviceId} shell getprop ${propName}`)
     .then(value => propValue = value);
 
-    console.log(`[getProp]: property ${propName} is set to ${propValue}`);
+    event.sender.send('app-log-print', `[getProp]: property ${propName} is set to ${propValue}`);
     return propValue;
 }
 

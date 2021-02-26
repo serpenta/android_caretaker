@@ -1,5 +1,4 @@
 const { ipcRenderer } = require('electron');
-
 const settings = require('../common/settings');
 const utils = require('../common/utilities');
 
@@ -112,4 +111,10 @@ ipcRenderer.on('print-package-version', (e, versionName, versionCode) => {
 
 ipcRenderer.on('display-prop-value', (e, propValue, fieldId) => {
     document.getElementById(fieldId).value = propValue;
+});
+
+ipcRenderer.on('app-log-print', (e, line) => {
+    const textarea = document.getElementById('app-log')
+    textarea.insertAdjacentHTML('beforeend', line+'&#10;');
+    textarea.scrollTop = textarea.scrollHeight;
 });

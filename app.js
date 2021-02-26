@@ -17,13 +17,14 @@ app.on('ready', () => {
 
     win.loadFile('./windows/main_window.html');
     win.webContents.on('did-finish-load', async (event) => {
-        const detectedDevices = await cmdController.scanDevices();
+        const detectedDevices = await cmdController.scanDevices(event);
         const devicesToDisplay = ['<option disabled>- Detected Devices -</option>'];
         detectedDevices.forEach(device => {
             devicesToDisplay.push(`<option value="${device}">${device}</option>`);
             ProgramState.pushDeviceID(device);
         });
         event.sender.send('display-conn-devices', devicesToDisplay);
+        event.sender.send('app-log-print', '[mainWindow]: App loaded!');
     });
 });
 
@@ -43,13 +44,13 @@ ipcMain.on('scan-dir-packages', async (event, directory) => {
     event.sender.send('display-packages', apkToDisplay, obbToDisplay);
 });
 
-ipcMain.on('install-app', async (e, deviceID, packageName, directory, apkFilename, obbFilename) => {
-    await cmdController.deleteApp(utils.wrapDeviceID(deviceID), packageName);
-    await cmdController.installApp(utils.wrapDeviceID(deviceID), directory, apkFilename, obbFilename);
+ipcMain.on('install-app', async (event, deviceID, packageName, directory, apkFilename, obbFilename) => {
+    await cmdController.deleteApp(utils.wrapDeviceID(deviceID), packageName, event);
+    await cmdController.installApp(utils.wrapDeviceID(deviceID), directory, apkFilename, obbFilename, event);
 });
 
 ipcMain.on('scan-conn-devices', async (event) => {
-    const detectedDevices = await cmdController.scanDevices();
+    const detectedDevices = await cmdController.scanDevices(event);
     const devicesToDisplay = ['<option disabled>- Detected Devices -</option>'];
     detectedDevices.forEach(device => {
         devicesToDisplay.push(`<option value="${device}">${device}</option>`);
@@ -63,8 +64,8 @@ ipcMain.on('print-package-version', async (event, deviceID, packageName) => {
     event.sender.send('print-package-version', versions.versionName, versions.versionCode);
 });
 
-ipcMain.on('save-app-logs', async (e, deviceID, packageName, fileName, pidSwitch) => {
-    const pid = pidSwitch ? await cmdController.fetchPid(utils.wrapDeviceID(deviceID), packageName) : null;
+ipcMain.on('save-app-logs', async (event, deviceID, packageName, fileName, pidSwitch) => {
+    const pid = pidSwitch ? await cmdController.fetchPid(event, utils.wrapDeviceID(deviceID), packageName) : null;
 
     let fileNameSafe = null;
     if (fileName.length > 0)
@@ -72,18 +73,18 @@ ipcMain.on('save-app-logs', async (e, deviceID, packageName, fileName, pidSwitch
     else
         fileNameSafe = `log_${packageName}_${utils.timeStampFile()}.txt`;
 
-    cmdController.dumpLogs(utils.wrapDeviceID(deviceID), fileNameSafe, pid);
+    cmdController.dumpLogs(event, utils.wrapDeviceID(deviceID), fileNameSafe, pid);
 });
 
-ipcMain.on('clear-app-logs', (e, deviceID) => {
-    cmdController.clearLogs(utils.wrapDeviceID(deviceID));
+ipcMain.on('clear-app-logs', (event, deviceID) => {
+    cmdController.clearLogs(event, utils.wrapDeviceID(deviceID));
 });
 
 ipcMain.on('property-name-change', async (event, deviceID, propName, fieldId) => {
-    const propValue = await cmdController.getProp(utils.wrapDeviceID(deviceID), propName);
+    const propValue = await cmdController.getProp(event, utils.wrapDeviceID(deviceID), propName);
     event.sender.send('display-prop-value', propValue, settings.propertyFields[fieldId]);
 });
 
-ipcMain.on('property-value-change', (e, deviceID, propValue, propName) => {
-    cmdController.setProp(utils.wrapDeviceID(deviceID), propName, propValue);
+ipcMain.on('property-value-change', (event, deviceID, propValue, propName) => {
+    cmdController.setProp(event, utils.wrapDeviceID(deviceID), propName, propValue);
 });
