@@ -53,6 +53,24 @@ function clearLogs (event, deviceId)
     return null;
 }
 
+async function memInfo(deviceIdString, packageName)
+{
+    return runCmd(`adb ${deviceIdString} shell "dumpsys meminfo ${packageName} | grep TOTAL"`)
+    .then(value => 
+        {
+            const totalsArray = value.match(/(\d+)/);
+            const totalVal = parseInt(totalsArray[0]);
+            if (totalVal / 1000 > ProgramState.getMaxValue()) ProgramState.setMaxValue(totalVal);
+            ProgramState.addMeasurementToAverage(totalVal);
+
+            console.log(`[memInfo]:
+            current: ${totalVal} kB
+            rollingAvg: ${ProgramState.fetchTenSecAvg()} mB
+            MIN: ${ProgramState.fetchTenSecMinimum()} mB
+            MAX: ${ProgramState.getMaxValue()} mB`);
+        });
+}
+
 /** procedures */
 
 async function scanDevices(event)
@@ -170,4 +188,5 @@ module.exports = {
     dumpLogs,
     clearLogs,
     fetchPid,
+    memInfo
 };

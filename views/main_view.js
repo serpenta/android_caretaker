@@ -45,6 +45,11 @@ document.getElementById('btn_clear-logs')
             utils.getInput('device-id-select'));
     });
 
+document.getElementById('btn_open-meminfo')
+    .addEventListener('click', () => {
+        ipcRenderer.send('open-meminfo');
+    });
+
 document.getElementById('device-id-select')
     .addEventListener('change', () => {
         Array.from(document.getElementsByClassName('feature-control_group_property-name'))

@@ -1,22 +1,23 @@
 const { app, ipcMain, BrowserWindow } = require('electron');
-
 const settings = require('./common/settings');
 const utils = require('./common/utilities');
 const cmdController = require('./controllers/cmd_ctrl');
 const { ProgramState } = require('./classes/State');
 
+ProgramState.init();
+
 app.on('ready', () => {
-    let win = new BrowserWindow
+    let winMain = new BrowserWindow
     ({
         width: 900,
-        height: 1000,
+        height: 1200,
         webPreferences: {
             nodeIntegration: true
         }
     });
 
-    win.loadFile('./windows/main_window.html');
-    win.webContents.on('did-finish-load', async (event) => {
+    winMain.loadFile('./windows/main_window.html');
+    winMain.webContents.on('did-finish-load', async (event) => {
         const detectedDevices = await cmdController.scanDevices(event);
         const devicesToDisplay = ['<option disabled>- Detected Devices -</option>'];
         detectedDevices.forEach(device => {
@@ -26,9 +27,28 @@ app.on('ready', () => {
         event.sender.send('display-conn-devices', devicesToDisplay);
         event.sender.send('app-log-print', '[mainWindow]: App loaded!');
     });
+
+    winMain.on('closed', () => app.quit());
 });
 
-app.on('window-all-closed', () => app.quit());
+ipcMain.on('open-meminfo', () => {
+    let winMeminfo = new BrowserWindow
+    ({
+        width: 900,
+        heigth: 1200,
+        webPreferences: {
+            nodeIntegration: true
+        }
+    });
+
+    winMeminfo.setAlwaysOnTop(true);
+    winMeminfo.loadFile('./windows/meminfo_window.html');
+    winMeminfo.webContents.on('did-finish-load', () => {
+        winMeminfo.webContents.send('results-display-init');
+    });
+});
+
+/* MAIN WINDOW RENDERER */
 
 ipcMain.on('scan-dir-packages', async (event, directory) => {
     const apkList = await cmdController.scanDirectory(directory, ".apk");
@@ -45,8 +65,8 @@ ipcMain.on('scan-dir-packages', async (event, directory) => {
 });
 
 ipcMain.on('install-app', async (event, deviceID, packageName, directory, apkFilename, obbFilename) => {
-    await cmdController.deleteApp(utils.wrapDeviceID(deviceID), packageName, event);
-    await cmdController.installApp(utils.wrapDeviceID(deviceID), directory, apkFilename, obbFilename, event);
+    await cmdController.deleteApp(event, utils.wrapDeviceID(deviceID), packageName);
+    await cmdController.installApp(event, utils.wrapDeviceID(deviceID), directory, apkFilename, obbFilename);
 });
 
 ipcMain.on('scan-conn-devices', async (event) => {
@@ -87,4 +107,41 @@ ipcMain.on('property-name-change', async (event, deviceID, propName, fieldId) =>
 
 ipcMain.on('property-value-change', (event, deviceID, propValue, propName) => {
     cmdController.setProp(event, utils.wrapDeviceID(deviceID), propName, propValue);
+});
+
+/* MEMINFO WINDOW RENDERER */
+
+ipcMain.on('btn-run-measurement', (event, deviceID, packageName) => {
+    ProgramState.resetJobDone();
+    event.sender.send('results-status-on');
+
+    async function measureMemory(deviceID, packageName)
+    {
+        if (ProgramState.getJobDone()) clearInterval(interval);
+
+        const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
+
+        await cmdController.memInfo(deviceIdString, packageName);
+
+        event.sender.send('print-results',
+            ProgramState.getCurrentValue(),
+            ProgramState.getMaxValue(),
+            ProgramState.fetchTenSecAvg(),
+            ProgramState.fetchTenSecMinimum());
+    }
+
+    const interval  = setInterval(measureMemory, 100, deviceID, packageName);
+});
+
+ipcMain.on('btn-reset-max', (e) => {
+    ProgramState.setMaxValue(0);
+});
+
+ipcMain.on('btn-reset-avg', (e) => {
+    ProgramState.resetAverage();
+});
+
+ipcMain.on('btn-stop-measurement', (event) => {
+    ProgramState.setJobDone();
+    event.sender.send('results-status-off');
 });
