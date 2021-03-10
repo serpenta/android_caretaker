@@ -23,6 +23,12 @@ document.getElementById('btn_scan-conn-devices')
         ipcRenderer.send('scan-conn-devices');
     });
 
+document.getElementById('package-name')
+    .addEventListener('change', () => {
+        ipcRenderer.send('progstat-change-packagename',
+            utils.getInput('package-name'));
+    });
+
 document.getElementById('btn_print-package-version')
     .addEventListener('click', () => {
         ipcRenderer.send('print-package-version',
@@ -62,6 +68,8 @@ document.getElementById('device-id-select')
                     element.id);
                 }
             });
+        ipcRenderer.send('progstat-change-active-device',
+            utils.getInput('device-id-select'));
     });
     
 Array.from(document.getElementsByClassName('feature-control_group_property-name'))
@@ -107,6 +115,8 @@ ipcRenderer.on('display-conn-devices', (e, devicesToDisplay) => {
     devicesToDisplay.forEach(device => {
         document.getElementById('device-id-select').insertAdjacentHTML('beforeend', device);
     });
+    ipcRenderer.send('progstat-change-active-device',
+        utils.getInput('device-id-select'));
 });
 
 ipcRenderer.on('print-package-version', (e, versionName, versionCode) => {

@@ -1,6 +1,10 @@
 class ProgramState
 {
     static settings = {
+        general: {
+            activeDevice: null,
+            packageName: null,
+        },
         meminfo: {
             measurePss: false,
             sendRunningCritical: true,
@@ -12,6 +16,30 @@ class ProgramState
     static jobDone = null;
     static maxValue = null;
     static tenSecVals = [];
+
+    static getActiveDevice() {
+        return this.settings.general.activeDevice;
+    }
+
+    static setActiveDevice(value) {
+        if (typeof value !== 'string')
+            return -1;
+        else
+            this.settings.general.activeDevice = value;
+            return null;
+    }
+
+    static getPackageName() {
+        return this.settings.general.packageName;
+    }
+
+    static setPackageName(value) {
+        if (typeof value !== 'string')
+            return -1;
+        else
+            this.settings.general.packageName = value;
+            return null;
+    }
 
     static getMeasurePss() {
         return this.settings.meminfo.measurePss;

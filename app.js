@@ -113,13 +113,25 @@ ipcMain.on('property-value-change', (event, deviceID, propValue, propName) => {
     cmdController.setProp(event, utils.wrapDeviceID(deviceID), propName, propValue);
 });
 
+ipcMain.on('progstat-change-active-device', (e, deviceID) => {
+    ProgramState.setActiveDevice(deviceID);
+    console.log(ProgramState.getActiveDevice());
+});
+
+ipcMain.on('progstat-change-packagename', (e, packageName) => {
+    ProgramState.setPackageName(packageName);
+    console.log(ProgramState.getPackageName());
+});
+
 /* MEMINFO WINDOW RENDERER */
 
-ipcMain.on('btn-run-measurement', (event, deviceID, packageName) => {
+ipcMain.on('btn-run-measurement', (event) => {
+    console.log('hej,kupseklej'+ProgramState.getActiveDevice());
     ProgramState.resetJobDone();
     ProgramState.resetMeminfoTicks();
     event.sender.send('results-status-on');
-    const deviceIdString = utils.wrapDeviceID(deviceID);
+    const deviceIdString = utils.wrapDeviceID(ProgramState.getActiveDevice());
+    const packageName = ProgramState.getPackageName();
 
     async function measureMemory()
     {
@@ -148,11 +160,11 @@ ipcMain.on('btn-run-measurement', (event, deviceID, packageName) => {
     const measureMemoryJob = setInterval(measureMemory, 100);
 });
 
-ipcMain.on('btn-send-trim-memory', (e) =>  {
+ipcMain.on('progstat-change-send-trim-memory', (e) =>  {
     ProgramState.setSendRunningCritical(!ProgramState.getSendRunningCritical());
 });
 
-ipcMain.on('btn-pss-uss_controls', (e) =>  {
+ipcMain.on('progstat-change-measure-pss', (e) =>  {
     ProgramState.setMeasurePss(!ProgramState.getMeasurePss());
 });
 

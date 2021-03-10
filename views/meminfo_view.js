@@ -1,7 +1,4 @@
 const { ipcRenderer } = require('electron');
-const { ProgramState } = require('../classes/State');
-
-const utils = require('../common/utilities');
 
 ipcRenderer.on('results-display-init', (e) => {
     document.getElementById('results-status').innerHTML = 'NOT Running';
@@ -25,22 +22,19 @@ ipcRenderer.on('print-results', (e, currentVal, maxVal, tenSecAvg, tenSecMin) =>
 document
     .getElementById('send-trim-memory')
     .addEventListener('change', () => {
-        ipcRenderer.send('btn-send-trim-memory')
+        ipcRenderer.send('progstat-change-send-trim-memory')
     });
 
 document
     .getElementById('pss-uss_controls')
     .addEventListener('change', () => {
-        ipcRenderer.send('btn-pss-uss_controls')
+        ipcRenderer.send('progstat-change-measure-pss')
     });
     
 document
     .getElementById('run-measurement')
     .addEventListener('click', () => 
-        ipcRenderer.send('btn-run-measurement',
-            utils.getInput('device-id'),
-            utils.getInput('package-name')
-        ));
+        ipcRenderer.send('btn-run-measurement'));
 
 document
     .getElementById('reset-max')
