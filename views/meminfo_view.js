@@ -25,14 +25,14 @@ ipcRenderer.on('print-results', (e, currentVal, maxVal, tenSecAvg, tenSecMin) =>
 document
     .getElementById('send-trim-memory')
     .addEventListener('change', () => {
-        ProgramState.setSendRunningCritical(!ProgramState.getSendRunningCritical());
+        ipcRenderer.send('btn-send-trim-memory')
     });
 
 document
     .getElementById('pss-uss_controls')
     .addEventListener('change', () => {
-        ProgramState.setMeasurePss(!ProgramState.getMeasurePss());
-    })
+        ipcRenderer.send('btn-pss-uss_controls')
+    });
     
 document
     .getElementById('run-measurement')

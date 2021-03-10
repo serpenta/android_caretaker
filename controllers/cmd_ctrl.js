@@ -60,7 +60,7 @@ function clearLogs (event, deviceId)
     return null;
 }
 
-async function memInfo(deviceIdString, packageName)
+async function memInfo(deviceIdString, packageName, measurePss)
 {
     return runCmd(`adb ${deviceIdString} shell "dumpsys meminfo ${packageName} | grep TOTAL"`)
     .then(value => 
@@ -68,7 +68,7 @@ async function memInfo(deviceIdString, packageName)
             const totalsArray = value.match(/\d+/g);
 
             let totalVal = 0;
-            if (ProgramState.getMeasurePss())
+            if (measurePss)
                 totalVal = parseInt(totalsArray[0]);
             else
                 totalVal = parseInt(totalsArray[1]);

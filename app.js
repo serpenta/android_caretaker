@@ -1,4 +1,4 @@
-const { app, ipcMain, BrowserWindow } = require('electron');
+const { app, ipcMain, BrowserWindow, ipcRenderer } = require('electron');
 const settings = require('./common/settings');
 const utils = require('./common/utilities');
 const cmdController = require('./controllers/cmd_ctrl');
@@ -126,7 +126,7 @@ ipcMain.on('btn-run-measurement', (event, deviceID, packageName) => {
         if (ProgramState.getJobDone())
             clearInterval(measureMemoryJob);
             
-        await cmdController.memInfo(deviceIdString, packageName);
+        await cmdController.memInfo(deviceIdString, packageName, ProgramState.getMeasurePss());
 
         event.sender.send('print-results',
             ProgramState.getCurrentValue(),
@@ -146,19 +146,14 @@ ipcMain.on('btn-run-measurement', (event, deviceID, packageName) => {
     };
 
     const measureMemoryJob = setInterval(measureMemory, 100);
+});
 
-    // if (ProgramState.settings.meminfo.sendRunningCritical)
-    // {
-    //     async function sendTrimMemory()
-    //     {
-    //         if (ProgramState.getJobDone()) clearInterval(sendTrimMemoryJob);
-    //         await cmdController.sendTrimMemory(event, deviceIdString, packageName);
+ipcMain.on('btn-send-trim-memory', (e) =>  {
+    ProgramState.setSendRunningCritical(!ProgramState.getSendRunningCritical());
+});
 
-    //         return null;
-    //     }
-
-    //     const sendTrimMemoryJob = setInterval(sendTrimMemory, 2000);
-    // };
+ipcMain.on('btn-pss-uss_controls', (e) =>  {
+    ProgramState.setMeasurePss(!ProgramState.getMeasurePss());
 });
 
 ipcMain.on('btn-reset-max', (e) => {
