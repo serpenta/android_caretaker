@@ -14,6 +14,13 @@ function runCmd(command)
 
 /** basic functions */
 
+function sendTrimMemory(event, deviceId, packageName)
+{
+    runCmd(`adb ${deviceId} shell am send-trim-memory ${packageName} RUNNING_CRITICAL`);
+    event.sender.send('app-log-print', '[MemInfo:] Memory trim sent');
+    return null;
+}
+
 function deleteApp(event, deviceId, packageName)
 {
     event.sender.send('app-log-print', `[deleteApp]: uninstalling...`);
@@ -58,8 +65,14 @@ async function memInfo(deviceIdString, packageName)
     return runCmd(`adb ${deviceIdString} shell "dumpsys meminfo ${packageName} | grep TOTAL"`)
     .then(value => 
         {
-            const totalsArray = value.match(/(\d+)/);
-            const totalVal = parseInt(totalsArray[0]);
+            const totalsArray = value.match(/\d+/g);
+
+            let totalVal = 0;
+            if (ProgramState.getMeasurePss())
+                totalVal = parseInt(totalsArray[0]);
+            else
+                totalVal = parseInt(totalsArray[1]);
+
             if (totalVal / 1000 > ProgramState.getMaxValue()) ProgramState.setMaxValue(totalVal);
             ProgramState.addMeasurementToAverage(totalVal);
 
@@ -188,5 +201,6 @@ module.exports = {
     dumpLogs,
     clearLogs,
     fetchPid,
-    memInfo
+    memInfo,
+    sendTrimMemory
 };

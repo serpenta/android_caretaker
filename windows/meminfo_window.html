@@ -24,6 +24,18 @@
 
     <div class="feature-control">
       <h3>Main controls</h3>
+      <div class="feature-control__radio-group" id="pss-uss_controls">
+        <input type="radio" id="select-pss" name="select_pss-uss" >
+        <label>PSS</label>
+        <input type="radio" id="select-uss" name="select_pss-uss" checked>
+        <label>USS</label>
+      </div>
+      
+      <div>
+        <input type="checkbox" id="send-trim-memory" checked>
+        <label>Send periodical TrimMemory RUNNING_CRITICAL request</label>
+      </div>
+
       <div class="feature-control__button-group">
         <button class="btn btn-primary" id="run-measurement">Run</button>
         <label>Run Measurement</label>

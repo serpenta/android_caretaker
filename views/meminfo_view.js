@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+const { ProgramState } = require('../classes/State');
 
 const utils = require('../common/utilities');
 
@@ -20,6 +21,18 @@ ipcRenderer.on('print-results', (e, currentVal, maxVal, tenSecAvg, tenSecMin) =>
     document.getElementById('results-value_average').innerHTML = tenSecAvg+' MB';
     document.getElementById('results-value_max').innerHTML = maxVal+' MB';
 });
+
+document
+    .getElementById('send-trim-memory')
+    .addEventListener('change', () => {
+        ProgramState.setSendRunningCritical(!ProgramState.getSendRunningCritical());
+    });
+
+document
+    .getElementById('pss-uss_controls')
+    .addEventListener('change', () => {
+        ProgramState.setMeasurePss(!ProgramState.getMeasurePss());
+    })
     
 document
     .getElementById('run-measurement')

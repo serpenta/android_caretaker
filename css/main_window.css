@@ -2,6 +2,10 @@ body {
     width: 900px;
 }
 
+.btn {
+    margin: 2px 0px 0px 2px;
+}
+
 .row {
     overflow: auto;
 }

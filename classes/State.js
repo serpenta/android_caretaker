@@ -1,9 +1,59 @@
 class ProgramState
 {
+    static settings = {
+        meminfo: {
+            measurePss: false,
+            sendRunningCritical: true,
+            memoryTrimInterval: 50,
+        }
+    }
+    static memoryTrimTicks = 0;
     static deviceIDs = [];
     static jobDone = null;
     static maxValue = null;
     static tenSecVals = [];
+
+    static getMeasurePss() {
+        return this.settings.meminfo.measurePss;
+    }
+
+    static setMeasurePss(value) {
+        if (typeof value !== 'boolean')
+            return -1;
+        else
+            this.settings.meminfo.measurePss = value;
+            return null;
+    }
+
+    static getSendRunningCritical() {
+        return this.settings.meminfo.sendRunningCritical;
+    }
+
+    static setSendRunningCritical(value) {
+        if (typeof value !== 'boolean')
+            return -1;
+        else
+            this.settings.meminfo.sendRunningCritical = value;
+            return null;
+    }
+
+    static getMemoryTrimInterval() {
+        return this.settings.meminfo.memoryTrimInterval;
+    }
+
+    static getMeminfoTicks() {
+        return this.memoryTrimTicks;
+    }
+
+    static incrementMeminfoTicks() {
+        this.memoryTrimTicks += 1;
+        return null;
+    }
+
+    static resetMeminfoTicks() {
+        this.memoryTrimTicks = 0;
+        return null;
+    }
 
     static getDeviceIDs() {
         return this.deviceIDs;

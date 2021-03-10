@@ -46,6 +46,10 @@ ipcMain.on('open-meminfo', () => {
     winMeminfo.webContents.on('did-finish-load', () => {
         winMeminfo.webContents.send('results-display-init');
     });
+
+    winMeminfo.on('closed', () => {
+        ProgramState.setJobDone();
+    })
 });
 
 /* MAIN WINDOW RENDERER */
@@ -113,14 +117,15 @@ ipcMain.on('property-value-change', (event, deviceID, propValue, propName) => {
 
 ipcMain.on('btn-run-measurement', (event, deviceID, packageName) => {
     ProgramState.resetJobDone();
+    ProgramState.resetMeminfoTicks();
     event.sender.send('results-status-on');
+    const deviceIdString = utils.wrapDeviceID(deviceID);
 
-    async function measureMemory(deviceID, packageName)
+    async function measureMemory()
     {
-        if (ProgramState.getJobDone()) clearInterval(interval);
-
-        const deviceIdString = deviceID === "" ? deviceID : `-s ${deviceID}`;
-
+        if (ProgramState.getJobDone())
+            clearInterval(measureMemoryJob);
+            
         await cmdController.memInfo(deviceIdString, packageName);
 
         event.sender.send('print-results',
@@ -128,9 +133,32 @@ ipcMain.on('btn-run-measurement', (event, deviceID, packageName) => {
             ProgramState.getMaxValue(),
             ProgramState.fetchTenSecAvg(),
             ProgramState.fetchTenSecMinimum());
-    }
 
-    const interval  = setInterval(measureMemory, 100, deviceID, packageName);
+        if (ProgramState.getSendRunningCritical()
+            && ProgramState.getMeminfoTicks() === ProgramState.getMemoryTrimInterval())
+            await cmdController.sendTrimMemory(event, deviceIdString, packageName);
+                
+        ProgramState.incrementMeminfoTicks();
+        if (ProgramState.getMeminfoTicks() > ProgramState.getMemoryTrimInterval())
+            ProgramState.resetMeminfoTicks();
+
+        return null;
+    };
+
+    const measureMemoryJob = setInterval(measureMemory, 100);
+
+    // if (ProgramState.settings.meminfo.sendRunningCritical)
+    // {
+    //     async function sendTrimMemory()
+    //     {
+    //         if (ProgramState.getJobDone()) clearInterval(sendTrimMemoryJob);
+    //         await cmdController.sendTrimMemory(event, deviceIdString, packageName);
+
+    //         return null;
+    //     }
+
+    //     const sendTrimMemoryJob = setInterval(sendTrimMemory, 2000);
+    // };
 });
 
 ipcMain.on('btn-reset-max', (e) => {
