@@ -41,7 +41,7 @@ function pushOBB(event, deviceId, directory, obbFilename)
 {   
     event.sender.send('app-log-print', `[pushOBB]: pushing... ${obbFilename}`);
 
-    return runCmd(`adb ${deviceId} push ${directory+obbFilename} mnt/sdcard/Android/obb/com.artifexmundi.balefire/${obbFilename}`)
+    return runCmd(`adb ${deviceId} push ${directory+obbFilename} /sdcard/Android/obb/com.artifexmundi.balefire/${obbFilename}`)
     .then(value => event.sender.send('app-log-print', `[pushOBB]: ${value}`));
 }
 
@@ -127,7 +127,7 @@ async function installApp(event, deviceId, directory, apkFilename, obbFilename)
     await installAPK(event, deviceId, directory, apkFilename);
 
     event.sender.send('app-log-print', `[installApp]: creating obb directory...`);
-    await runCmd(`adb ${deviceId} shell "mkdir mnt/sdcard/Android/obb/com.artifexmundi.balefire`)
+    await runCmd(`adb ${deviceId} shell "mkdir /sdcard/Android/obb/com.artifexmundi.balefire"`)
     .then(value => event.sender.send('app-log-print', value));
     
     await pushOBB(event, deviceId, directory, obbFilename)
@@ -169,11 +169,11 @@ async function fetchPid(event, deviceId, packageName)
 async function dumpLogs (event, deviceId, fileName, pid)
 {
     if (pid !== null)
-        await runCmd(`adb ${deviceId} logcat -d -f mnt/sdcard/Download/${fileName} --pid=${pid}`);
+        await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${fileName} --pid=${pid}`);
     else
-        await runCmd(`adb ${deviceId} logcat -d -f mnt/sdcard/Download/${fileName}`);
-    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileName}\' dumped at mnt/sdcard/Download`);
-    runCmd(`adb ${deviceId} pull "mnt/sdcard/Download/${fileName}" "./logs/${fileName}"`)
+        await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${fileName}`);
+    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileName}\' dumped at /sdcard/Download`);
+    runCmd(`adb ${deviceId} pull "/sdcard/Download/${fileName}" "./logs/${fileName}"`)
     event.sender.send('app-log-print', `[dumpLogs]: log \'${fileName}\' pulled to ./logs/`);
     return null;
 }

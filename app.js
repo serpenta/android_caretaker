@@ -126,7 +126,6 @@ ipcMain.on('progstat-change-packagename', (e, packageName) => {
 /* MEMINFO WINDOW RENDERER */
 
 ipcMain.on('btn-run-measurement', (event) => {
-    console.log('hej,kupseklej'+ProgramState.getActiveDevice());
     ProgramState.resetJobDone();
     ProgramState.resetMeminfoTicks();
     event.sender.send('results-status-on');

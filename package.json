@@ -1,6 +1,6 @@
 {
   "name": "andcare",
-  "version": "0.2.0",
+  "version": "0.2.0b",
   "description": "tool do ogarniania urządzeń Android za pomocą komend ADB",
   "main": "app.js",
   "scripts": {
@@ -19,6 +19,7 @@
     "productName": "Android Caretaker",
     "copyright": "Copyright © 2020 Adrian Rutkiewicz",
     "directories": {
+      "buildResources": "./resources",
       "output": "./build/${version}"
     }
   },
