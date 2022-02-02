@@ -1,5 +1,6 @@
 const childProcess = require('child_process');
-const { pid } = require('process');
+// const { pid } = require('process');
+const utils = require('../common/utilities');
 const { ProgramState } = require('../classes/State');
 
 function runCmd(command)
@@ -157,25 +158,35 @@ async function fetchPid(event, deviceId, packageName)
 {
     let pid = null;
 
-    await runCmd(`adb ${deviceId} shell "ps | grep ${packageName}`)
+    await runCmd(`adb ${deviceId} shell "ps | grep ${packageName}"`)
     .then(value => {
         const matchPid = value.match(/(\s\d+\s)/);
         pid = matchPid[0].slice(1, matchPid[0].length-1);
-        event.sender.send('app-log-print', `[fetchPit]: ${pid}`);
+        event.sender.send('app-log-print', `[fetchPid]: ${pid}`);
     });
         
     return pid;
 }
 
-async function dumpLogs (event, deviceId, fileDirectory, fileName, pid)
+async function dumpLogs (event, deviceId, packageName, fileDirectory, fileName, pidSwitch)
 {
-    if (pid !== null)
-        await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${fileName} --pid=${pid}`);
+    const pid = pidSwitch ? await fetchPid(event, deviceId, packageName) : null;
+    const fileDirSafe = fileDirectory.length > 1 ? fileDirectory : "./logs/";
+    
+    let fileNameSafe = null;
+    if (fileName.length > 0)
+        fileNameSafe = fileName.slice(fileName.length-4).match(/(\.[a-z]{3}$)/) === null ? fileName+".txt" : fileName;
     else
-        await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${fileName}`);
-    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileName}\' dumped at /sdcard/Download`);
-    runCmd(`adb ${deviceId} pull "/sdcard/Download/${fileName}" "${fileDirectory}${fileName}"`)
-    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileName}\' pulled to ${fileDirectory}`);
+        fileNameSafe = `log_${packageName}_${utils.timeStampFile()}.txt`;
+
+    if (pid !== null)
+        await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${fileNameSafe} --pid=${pid}`);
+    else
+        await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${fileNameSafe}`);
+
+    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileNameSafe}\' dumped at /sdcard/Download`);
+    runCmd(`adb ${deviceId} pull "/sdcard/Download/${fileNameSafe}" "${fileDirSafe}${fileNameSafe}"`)
+    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileNameSafe}\' pulled to ${fileDirSafe}`);
     return null;
 }
 
@@ -213,7 +224,6 @@ module.exports = {
     dumpLogs,
     openLogcatWindow,
     clearLogs,
-    fetchPid,
     memInfo,
     sendTrimMemory
 };

@@ -88,22 +88,8 @@ ipcMain.on('print-package-version', async (event, deviceID, packageName) => {
     event.sender.send('print-package-version', versions.versionName, versions.versionCode);
 });
 
-ipcMain.on('save-app-logs', async (event, deviceID, packageName, fileDirectory, fileName, pidSwitch) => {
-    const pid = pidSwitch ? await cmdController.fetchPid(event, utils.wrapDeviceID(deviceID), packageName) : null;
-
-    let fileDirSafe = null;
-    if (fileDirectory.length > 0)
-        fileDirSafe = fileDirectory;
-    else
-        fileDirSafe = "./logs/";
-
-    let fileNameSafe = null;
-    if (fileName.length > 0)
-        fileNameSafe = fileName.slice(fileName.length-4).match(/(\.[a-z]{3}$)/) === null ? fileName+".txt" : fileName;
-    else
-        fileNameSafe = `log_${packageName}_${utils.timeStampFile()}.txt`;
-
-    cmdController.dumpLogs(event, utils.wrapDeviceID(deviceID), fileDirSafe, fileNameSafe, pid);
+ipcMain.on('save-app-logs', async (event, deviceId, packageName, fileDirectory, fileName, pidSwitch) => {
+    cmdController.dumpLogs(event, utils.wrapDeviceID(deviceId), packageName, fileDirectory, fileName, pidSwitch);
 });
 
 ipcMain.on('open-logcat', (event, deviceId, packageName, pidSwitch) => {
@@ -125,12 +111,10 @@ ipcMain.on('property-value-change', (event, deviceID, propValue, propName) => {
 
 ipcMain.on('progstat-change-active-device', (e, deviceID) => {
     ProgramState.setActiveDevice(deviceID);
-    console.log(ProgramState.getActiveDevice());
 });
 
 ipcMain.on('progstat-change-packagename', (e, packageName) => {
     ProgramState.setPackageName(packageName);
-    console.log(ProgramState.getPackageName());
 });
 
 /* MEMINFO WINDOW RENDERER */
