@@ -93,7 +93,7 @@ ipcMain.on('save-app-logs', async (event, deviceID, packageName, fileDirectory, 
 
     let fileDirSafe = null;
     if (fileDirectory.length > 0)
-        fileDirSafe = fileDirectory.slice(fileDirectory.length-1) === '\\' ? fileDirectory : fileDirectory+'\\';
+        fileDirSafe = fileDirectory;
     else
         fileDirSafe = "./logs/";
 

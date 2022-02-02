@@ -22,7 +22,12 @@ function getRadio (radioName)
 {
     const radio = document.getElementsByName(radioName);
     let value = null;
-    radio.forEach(el => { if (el.checked) value = el.value; });
+    for (i = 0; i < radio.length; i++) {
+        if (radio[i].checked) {
+            value = radio[i];
+            break;
+        }
+    }
     return value;
 }
 

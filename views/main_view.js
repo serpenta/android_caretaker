@@ -41,7 +41,7 @@ document.getElementById('btn_save-logs')
         ipcRenderer.send('save-app-logs',
             utils.getInput('device-id-select'),
             utils.getInput('package-name'),
-            utils.getInput('logs-target-directory'),
+            utils.getAbsFilepath('logs-target-directory'),
             utils.getInput('logs-target-name'),
             utils.getCheckbox('logs-pid-filter'));
     });
