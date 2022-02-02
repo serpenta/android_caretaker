@@ -1,4 +1,5 @@
 const childProcess = require('child_process');
+const { pid } = require('process');
 const { ProgramState } = require('../classes/State');
 
 function runCmd(command)
@@ -166,15 +167,15 @@ async function fetchPid(event, deviceId, packageName)
     return pid;
 }
 
-async function dumpLogs (event, deviceId, fileName, pid)
+async function dumpLogs (event, deviceId, fileDirectory, fileName, pid)
 {
     if (pid !== null)
         await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${fileName} --pid=${pid}`);
     else
         await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${fileName}`);
     event.sender.send('app-log-print', `[dumpLogs]: log \'${fileName}\' dumped at /sdcard/Download`);
-    runCmd(`adb ${deviceId} pull "/sdcard/Download/${fileName}" "./logs/${fileName}"`)
-    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileName}\' pulled to ./logs/`);
+    runCmd(`adb ${deviceId} pull "/sdcard/Download/${fileName}" "${fileDirectory}${fileName}"`)
+    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileName}\' pulled to ${fileDirectory}`);
     return null;
 }
 

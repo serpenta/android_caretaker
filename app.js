@@ -88,8 +88,14 @@ ipcMain.on('print-package-version', async (event, deviceID, packageName) => {
     event.sender.send('print-package-version', versions.versionName, versions.versionCode);
 });
 
-ipcMain.on('save-app-logs', async (event, deviceID, packageName, fileName, pidSwitch) => {
+ipcMain.on('save-app-logs', async (event, deviceID, packageName, fileDirectory, fileName, pidSwitch) => {
     const pid = pidSwitch ? await cmdController.fetchPid(event, utils.wrapDeviceID(deviceID), packageName) : null;
+
+    let fileDirSafe = null;
+    if (fileDirectory.length > 0)
+        fileDirSafe = fileDirectory.slice(fileDirectory.length-1) === '\\' ? fileDirectory : fileDirectory+'\\';
+    else
+        fileDirSafe = "./logs/";
 
     let fileNameSafe = null;
     if (fileName.length > 0)
@@ -97,7 +103,7 @@ ipcMain.on('save-app-logs', async (event, deviceID, packageName, fileName, pidSw
     else
         fileNameSafe = `log_${packageName}_${utils.timeStampFile()}.txt`;
 
-    cmdController.dumpLogs(event, utils.wrapDeviceID(deviceID), fileNameSafe, pid);
+    cmdController.dumpLogs(event, utils.wrapDeviceID(deviceID), fileDirSafe, fileNameSafe, pid);
 });
 
 ipcMain.on('clear-app-logs', (event, deviceID) => {
