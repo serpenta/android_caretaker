@@ -46,6 +46,14 @@ document.getElementById('btn_save-logs')
             utils.getCheckbox('logs-pid-filter'));
     });
 
+document.getElementById('btn_open-logcat')
+.addEventListener('click', () => {
+    ipcRenderer.send('open-logcat',
+        utils.getInput('device-id-select'),
+        utils.getInput('package-name'),
+        utils.getCheckbox('logs-pid-filter'));
+});
+
 document.getElementById('btn_clear-logs')
     .addEventListener('click', () => {
         ipcRenderer.send('clear-app-logs',

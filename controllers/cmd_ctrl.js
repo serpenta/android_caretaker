@@ -179,6 +179,17 @@ async function dumpLogs (event, deviceId, fileDirectory, fileName, pid)
     return null;
 }
 
+async function openLogcatWindow (event, deviceId, packageName, pidSwitch)
+{
+    if (pidSwitch)
+    {
+        const pid = await fetchPid(event, deviceId, packageName);
+        runCmd(`start cmd /K adb ${deviceId} logcat --pid=${pid}`);
+    }
+    else
+        runCmd(`start cmd /K adb ${deviceId} logcat`);
+}
+
 async function getProp(event, deviceId, propName)
 {
     let propValue = null;
@@ -200,6 +211,7 @@ module.exports = {
     installAPK,
     installApp,
     dumpLogs,
+    openLogcatWindow,
     clearLogs,
     fetchPid,
     memInfo,

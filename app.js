@@ -106,6 +106,10 @@ ipcMain.on('save-app-logs', async (event, deviceID, packageName, fileDirectory, 
     cmdController.dumpLogs(event, utils.wrapDeviceID(deviceID), fileDirSafe, fileNameSafe, pid);
 });
 
+ipcMain.on('open-logcat', (event, deviceId, packageName, pidSwitch) => {
+    cmdController.openLogcatWindow(event, utils.wrapDeviceID(deviceId), packageName, pidSwitch);
+});
+
 ipcMain.on('clear-app-logs', (event, deviceID) => {
     cmdController.clearLogs(event, utils.wrapDeviceID(deviceID));
 });
