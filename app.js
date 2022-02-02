@@ -68,9 +68,9 @@ ipcMain.on('scan-dir-packages', async (event, directory) => {
     event.sender.send('display-packages', apkToDisplay, obbToDisplay);
 });
 
-ipcMain.on('install-app', async (event, deviceID, packageName, directory, apkFilename, obbFilename) => {
-    await cmdController.deleteApp(event, utils.wrapDeviceID(deviceID), packageName);
-    await cmdController.installApp(event, utils.wrapDeviceID(deviceID), directory, apkFilename, obbFilename);
+ipcMain.on('install-app', async (event, deviceId, packageName, directory, apkFilename, obbFilename) => {
+    await cmdController.deleteApp(event, utils.wrapDeviceID(deviceId), packageName);
+    await cmdController.installApp(event, utils.wrapDeviceID(deviceId), directory, apkFilename, obbFilename);
 });
 
 ipcMain.on('scan-conn-devices', async (event) => {
@@ -83,8 +83,8 @@ ipcMain.on('scan-conn-devices', async (event) => {
     event.sender.send('display-conn-devices', devicesToDisplay);
 });
 
-ipcMain.on('print-package-version', async (event, deviceID, packageName) => {
-    const versions = await cmdController.getVersionName(utils.wrapDeviceID(deviceID), packageName);
+ipcMain.on('print-package-version', async (event, deviceId, packageName) => {
+    const versions = await cmdController.getVersionName(utils.wrapDeviceID(deviceId), packageName);
     event.sender.send('print-package-version', versions.versionName, versions.versionCode);
 });
 
@@ -96,25 +96,27 @@ ipcMain.on('open-logcat', (event, deviceId, packageName, pidSwitch) => {
     cmdController.openLogcatWindow(event, utils.wrapDeviceID(deviceId), packageName, pidSwitch);
 });
 
-ipcMain.on('clear-app-logs', (event, deviceID) => {
-    cmdController.clearLogs(event, utils.wrapDeviceID(deviceID));
+ipcMain.on('clear-app-logs', (event, deviceId) => {
+    cmdController.clearLogs(event, utils.wrapDeviceID(deviceId));
 });
 
-ipcMain.on('property-name-change', async (event, deviceID, propName, fieldId) => {
-    const propValue = await cmdController.getProp(event, utils.wrapDeviceID(deviceID), propName);
+ipcMain.on('property-name-change', async (event, deviceId, propName, fieldId) => {
+    const propValue = await cmdController.getProp(event, utils.wrapDeviceID(deviceId), propName);
     event.sender.send('display-prop-value', propValue, settings.propertyFields[fieldId]);
 });
 
-ipcMain.on('property-value-change', (event, deviceID, propValue, propName) => {
-    cmdController.setProp(event, utils.wrapDeviceID(deviceID), propName, propValue);
+ipcMain.on('property-value-change', (event, deviceId, propValue, propName) => {
+    cmdController.setProp(event, utils.wrapDeviceID(deviceId), propName, propValue);
 });
 
-ipcMain.on('progstat-change-active-device', (e, deviceID) => {
-    ProgramState.setActiveDevice(deviceID);
+ipcMain.on('progstat-change-active-device', (event, deviceId) => {
+    ProgramState.setActiveDevice(deviceId);
 });
 
-ipcMain.on('progstat-change-packagename', (e, packageName) => {
+ipcMain.on('progstat-change-packagename', async (event, deviceId, packageName) => {
     ProgramState.setPackageName(packageName);
+    const versions = await cmdController.getVersionName(utils.wrapDeviceID(deviceId), packageName);
+    event.sender.send('print-package-version', versions.versionName, versions.versionCode);
 });
 
 /* MEMINFO WINDOW RENDERER */

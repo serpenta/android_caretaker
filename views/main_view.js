@@ -26,6 +26,7 @@ document.getElementById('btn_scan-conn-devices')
 document.getElementById('package-name')
     .addEventListener('change', () => {
         ipcRenderer.send('progstat-change-packagename',
+            utils.getInput('device-id-select'),
             utils.getInput('package-name'));
     });
 
