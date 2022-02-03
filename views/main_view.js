@@ -133,7 +133,7 @@ Array.from(document.getElementsByClassName('feature-control_group_property-value
 
 /** ipcMain channel handlers */
 
-ipcRenderer.on('restore-user-settings', (e, fieldsContents) => {
+ipcRenderer.on('restore-fields-contents', (e, fieldsContents) => {
     Object.keys(fieldsContents).forEach(key => {
         document.getElementById(key).value = fieldsContents[key];
     });

@@ -17,6 +17,30 @@ function readUserSettings (event) {
     }
 }
 
+async function scanConnectedDevices (event) {
+    const detectedDevices = await cmdController.scanDevices(event);
+    const devicesToDisplay = ['<option disabled>- Detected Devices -</option>'];
+    detectedDevices.forEach(device => {
+        devicesToDisplay.push(`<option value="${device}">${device}</option>`);
+        ProgramState.pushDeviceID(device);
+    });
+    return devicesToDisplay;
+}
+
+async function scanPackagesDirectory (packagesAbsPath) {
+    const apkList = await cmdController.scanDirectory(packagesAbsPath, ".apk");
+    const apkToDisplay = ['<option disabled>- Detected APK -</option>'];
+    apkList.forEach(file => {
+        apkToDisplay.push(`<option value="${file}">${file}</option>`);
+    });
+    const obbList = await cmdController.scanDirectory(packagesAbsPath, ".obb");
+    const obbToDisplay = ['<option value="">None</option>', '<option disabled>- Detected OBB -</option>'];
+    obbList.forEach(file => {
+        obbToDisplay.push(`<option value="${file}">${file}</option>`);
+    });
+    return [apkToDisplay, obbToDisplay];
+}
+
 app.on('ready', () => {
     let winMain = new BrowserWindow
     ({
@@ -29,17 +53,17 @@ app.on('ready', () => {
 
     winMain.loadFile('./windows/main_window.html');
     winMain.webContents.on('did-finish-load', async (event) => {
-        const detectedDevices = await cmdController.scanDevices(event);
-        const devicesToDisplay = ['<option disabled>- Detected Devices -</option>'];
-        detectedDevices.forEach(device => {
-            devicesToDisplay.push(`<option value="${device}">${device}</option>`);
-            ProgramState.pushDeviceID(device);
-        });
+        const devicesToDisplay = await scanConnectedDevices(event);
         const userSettings = readUserSettings(event);
         ProgramState.restoreFieldsContents(userSettings);
+        if (ProgramState.getPackagesPath()) {
+            const packagesAbsPath = ProgramState.getPackagesPath();
+            const [apkToDisplay, obbToDisplay] = await scanPackagesDirectory(packagesAbsPath); 
+            event.sender.send('display-packages', apkToDisplay, obbToDisplay);
+        }
         event.sender.send('display-conn-devices', devicesToDisplay);
         event.sender.send('app-log-print', '[main]: App loaded!');
-        event.sender.send('restore-user-settings', ProgramState.getFieldsContents());
+        event.sender.send('restore-fields-contents', ProgramState.getFieldsContents());
     });
 
     winMain.on('closed', () => {
@@ -72,16 +96,7 @@ ipcMain.on('open-meminfo', () => {
 /* MAIN WINDOW RENDERER */
 
 ipcMain.on('scan-dir-packages', async (event, packagesAbsPath) => {
-    const apkList = await cmdController.scanDirectory(packagesAbsPath, ".apk");
-    const apkToDisplay = ['<option disabled>- Detected APK -</option>'];
-    apkList.forEach(file => {
-        apkToDisplay.push(`<option value="${file}">${file}</option>`);
-    });
-    const obbList = await cmdController.scanDirectory(packagesAbsPath, ".obb");
-    const obbToDisplay = ['<option value="">None</option>', '<option disabled>- Detected OBB -</option>'];
-    obbList.forEach(file => {
-        obbToDisplay.push(`<option value="${file}">${file}</option>`);
-    });
+    const [apkToDisplay, obbToDisplay] = await scanPackagesDirectory(packagesAbsPath);
     event.sender.send('display-packages', apkToDisplay, obbToDisplay);
 });
 
@@ -91,12 +106,7 @@ ipcMain.on('install-app', async (event, deviceId, packageName, packagesAbsPath, 
 });
 
 ipcMain.on('scan-conn-devices', async (event) => {
-    const detectedDevices = await cmdController.scanDevices(event);
-    const devicesToDisplay = ['<option disabled>- Detected Devices -</option>'];
-    detectedDevices.forEach(device => {
-        devicesToDisplay.push(`<option value="${device}">${device}</option>`);
-        ProgramState.pushDeviceID(device);
-    });
+    const devicesToDisplay = await scanConnectedDevices(event);
     event.sender.send('display-conn-devices', devicesToDisplay);
 });
 
