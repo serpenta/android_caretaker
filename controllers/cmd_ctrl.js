@@ -175,7 +175,9 @@ async function dumpLogs (event, deviceId, packageName, targetPath, targetName, p
     
     let targetNameSafe = null;
     if (targetName.length > 0)
-        targetNameSafe = targetName.slice(targetName.length-4).match(/(\.[a-z]{3}$)/) === null ? targetName+".txt" : targetName;
+        targetNameSafe = targetName.slice(targetName.length-4).match(/(\.[a-z]{3}$)/) === null 
+            ? `log_${packageName}_${utils.timeStampFile()}_`+targetName+".txt"
+            : `log_${packageName}_${utils.timeStampFile()}_`+targetName;
     else
         targetNameSafe = `log_${packageName}_${utils.timeStampFile()}.txt`;
 
