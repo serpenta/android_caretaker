@@ -1,5 +1,4 @@
 const { ipcRenderer } = require('electron');
-const settings = require('../common/settings');
 const utils = require('../common/utilities');
 const { ProgramState } = require('../classes/State');
 

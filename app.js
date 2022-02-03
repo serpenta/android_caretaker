@@ -1,4 +1,4 @@
-const { app, ipcMain, BrowserWindow, ipcRenderer } = require('electron');
+const { app, ipcMain, BrowserWindow } = require('electron');
 const filesys = require('fs');
 const path = require('path');
 
