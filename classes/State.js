@@ -7,15 +7,15 @@ class ProgramState
             logsTargetPath: null,
             logsTargetName: null,
             packagesPath: null,
-            propertyName_1: null,
-            propertyName_2: null,
-            propertyName_3: null,
-            propertyName_4: null,
-            propertyName_5: null,
-            propertyName_6: null,
-            propertyName_7: null,
-            propertyName_8: null,
-            propertyName_9: null
+            'property-name_1': null,
+            'property-name_2': null,
+            'property-name_3': null,
+            'property-name-4': null,
+            'property-name_5': null,
+            'property-name-6': null,
+            'property-name_7': null,
+            'property-name_8': null,
+            'property-name_9': null
         },
         meminfo: {
             measurePss: false,
@@ -86,6 +86,18 @@ class ProgramState
             return -1;
         else
             this.settings.general.packagesPath = value
+            return null;
+    }
+
+    static getPropertyName(fieldId) {
+        return this.settings.general[fieldId];
+    }
+
+    static setPropertyName(fieldId, value) {
+        if (typeof value !== 'string')
+            return -1;
+        else
+            this.settings.general[fieldId] = value;
             return null;
     }
 

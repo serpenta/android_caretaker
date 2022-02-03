@@ -103,6 +103,7 @@ ipcMain.on('clear-app-logs', (event, deviceId) => {
 });
 
 ipcMain.on('property-name-change', async (event, deviceId, propName, fieldId) => {
+    ProgramState.setPropertyName(fieldId, propName);
     const propValue = await cmdController.getProp(event, utils.wrapDeviceID(deviceId), propName);
     event.sender.send('display-prop-value', propValue, settings.propertyFields[fieldId]);
 });
