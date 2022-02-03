@@ -62,6 +62,12 @@ function clearLogs (event, deviceId)
     return null;
 }
 
+function openExplorerWindow (directory)
+{
+    runCmd(`start explorer ${directory}`);
+    return null;
+}
+
 async function memInfo(deviceIdString, packageName, measurePss)
 {
     return runCmd(`adb ${deviceIdString} shell "dumpsys meminfo ${packageName} | grep TOTAL"`)
@@ -226,6 +232,7 @@ module.exports = {
     dumpLogs,
     openLogcatWindow,
     clearLogs,
+    openExplorerWindow,
     memInfo,
     sendTrimMemory
 };

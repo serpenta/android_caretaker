@@ -10,6 +10,14 @@ document.getElementById('btn_scan-dir-packages')
             utils.getAbsFilepath('packages-abs-path'));
     });
 
+document.getElementById('btn_open-dir-packages')
+    .addEventListener('click', () => {
+        if (document.getElementById('packages-abs-path').value) {
+            ipcRenderer.send('open-folder',
+                utils.getInput('packages-abs-path'));
+        }
+    });
+
 document.getElementById('btn_install-app')
     .addEventListener('click', () => {
         ipcRenderer.send('install-app',
@@ -32,6 +40,14 @@ document.getElementById('btn_print-package-version')
             utils.getInput('package-name'));
     });
 
+document.getElementById('btn_open-dir-logs')
+    .addEventListener('click', () => {
+        if (document.getElementById('logs-target-path').value) {
+            ipcRenderer.send('open-folder',
+                utils.getInput('logs-target-path'));
+        }
+    })
+
 document.getElementById('btn_save-logs')
     .addEventListener('click', () => {
         ipcRenderer.send('save-app-logs',
@@ -43,12 +59,12 @@ document.getElementById('btn_save-logs')
     });
 
 document.getElementById('btn_open-logcat')
-.addEventListener('click', () => {
-    ipcRenderer.send('open-logcat',
-        utils.getInput('device-id-select'),
-        utils.getInput('package-name'),
-        utils.getCheckbox('logs-pid-filter'));
-});
+    .addEventListener('click', () => {
+        ipcRenderer.send('open-logcat',
+            utils.getInput('device-id-select'),
+            utils.getInput('package-name'),
+            utils.getCheckbox('logs-pid-filter'));
+    });
 
 document.getElementById('btn_clear-logs')
     .addEventListener('click', () => {

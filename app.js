@@ -114,6 +114,10 @@ ipcMain.on('open-meminfo', () => {
 
 /* MAIN WINDOW RENDERER */
 
+ipcMain.on('open-folder', (event, folderPath) => {
+    cmdController.openExplorerWindow(folderPath);
+});
+
 ipcMain.on('scan-dir-packages', async (event, packagesAbsPath) => {
     const [apkToDisplay, obbToDisplay] = await scanPackagesDirectory(packagesAbsPath);
     event.sender.send('display-packages', apkToDisplay, obbToDisplay);
