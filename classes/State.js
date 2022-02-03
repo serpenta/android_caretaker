@@ -101,6 +101,10 @@ class ProgramState
             return null;
     }
 
+    static getFieldsContents() {
+        return this.settings.general;
+    }
+
     static getMeasurePss() {
         return this.settings.meminfo.measurePss;
     }

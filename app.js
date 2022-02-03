@@ -1,4 +1,6 @@
 const { app, ipcMain, BrowserWindow, ipcRenderer } = require('electron');
+const filesys = require('fs')
+
 const settings = require('./common/settings');
 const utils = require('./common/utilities');
 const cmdController = require('./controllers/cmd_ctrl');
@@ -29,7 +31,8 @@ app.on('ready', () => {
     });
 
     winMain.on('closed', () => {
-        app.quit()
+        filesys.writeFileSync(`./UserSettings.json`, JSON.stringify(ProgramState.getFieldsContents()));
+        app.quit();
     });
 });
 
