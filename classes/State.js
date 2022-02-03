@@ -1,7 +1,7 @@
 class ProgramState
 {
     static settings = {
-        deviceId: null,
+        activeDevice: null,
         general: {
             'package-name': null,
             'logs-target-path': null,
@@ -17,6 +17,30 @@ class ProgramState
             'property-name_8': null,
             'property-name_9': null
         },
+        propFieldsDict: {
+            propNameFields: {
+                'property-name_1': 'property-value_1',
+                'property-name_2': 'property-value_2',
+                'property-name_3': 'property-value_3',
+                'property-name_4': 'property-value_4',
+                'property-name_5': 'property-value_5',
+                'property-name_6': 'property-value_6',
+                'property-name_7': 'property-value_7',
+                'property-name_8': 'property-value_8',
+                'property-name_9': 'property-value_9',
+            },
+            propValueFields: {
+                'property-value_1': 'property-name_1',
+                'property-value_2': 'property-name_2',
+                'property-value_3': 'property-name_3',
+                'property-value_4': 'property-name_4',
+                'property-value_5': 'property-name_5',
+                'property-value_6': 'property-name_6',
+                'property-value_7': 'property-name_7',
+                'property-value_8': 'property-name_8',
+                'property-value_9': 'property-name_9',
+            }
+        },
         meminfo: {
             measurePss: false,
             sendRunningCritical: true,
@@ -30,14 +54,14 @@ class ProgramState
     static tenSecVals = [];
 
     static getActiveDevice() {
-        return this.settings.deviceId;
+        return this.settings.activeDevice;
     }
 
     static setActiveDevice(value) {
         if (typeof value !== 'string')
             return -1;
         else
-            this.settings.deviceId = value;
+            this.settings.activeDevice = value;
             return null;
     }
 
@@ -112,6 +136,14 @@ class ProgramState
             Object.keys(contents).forEach(key => {
                 this.settings.general[key] = contents[key];
             });
+    }
+
+    static getPropValueFieldByName(propNameField) {
+        return this.settings.propFieldsDict.propNameFields[propNameField];
+    }
+
+    static getPropNameFieldByValue(propValueField) {
+        return this.settings.propFieldsDict.propValueFields[propValueField];
     }
 
     static getMeasurePss() {

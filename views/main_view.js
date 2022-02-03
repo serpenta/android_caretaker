@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron');
 const settings = require('../common/settings');
 const utils = require('../common/utilities');
+const { ProgramState } = require('../classes/State');
 
 /** on click */
 
@@ -124,7 +125,7 @@ Array.from(document.getElementsByClassName('feature-control_group_property-name'
 
 Array.from(document.getElementsByClassName('feature-control_group_property-value'))
     .forEach(element => element.addEventListener('change', (event) => {
-        const propNameFieldId = settings.propertyFields[event.target.id];
+        const propNameFieldId = ProgramState.getPropNameFieldByValue(event.target.id);
         ipcRenderer.send('property-value-change',
             utils.getInput('device-id-select'),
             event.target.value,

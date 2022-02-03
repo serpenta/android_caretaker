@@ -2,7 +2,6 @@ const { app, ipcMain, BrowserWindow, ipcRenderer } = require('electron');
 const filesys = require('fs');
 const path = require('path');
 
-const settings = require('./common/settings');
 const utils = require('./common/utilities');
 const cmdController = require('./controllers/cmd_ctrl');
 const { ProgramState } = require('./classes/State');
@@ -23,6 +22,7 @@ async function scanConnectedDevices (event) {
     detectedDevices.forEach(device => {
         devicesToDisplay.push(`<option value="${device}">${device}</option>`);
         ProgramState.pushDeviceID(device);
+        ProgramState.setActiveDevice(device);
     });
     return devicesToDisplay;
 }
@@ -41,6 +41,21 @@ async function scanPackagesDirectory (packagesAbsPath) {
     return [apkToDisplay, obbToDisplay];
 }
 
+async function scanProperties (event, userSettings) {
+    const activeDevice = ProgramState.getActiveDevice();
+    if (activeDevice) {
+        Object.keys(userSettings).forEach(async (propNameField) => {
+            if (ProgramState.getPropValueFieldByName(propNameField)) {
+                const propName = ProgramState.getPropertyName(propNameField);
+                if (propName) {
+                    const propValue = await cmdController.getProp(event, utils.wrapDeviceID(activeDevice), propName);
+                    event.sender.send('display-prop-value', propValue, ProgramState.getPropValueFieldByName(propNameField));
+                }
+            }
+        });
+    }
+}
+
 app.on('ready', () => {
     let winMain = new BrowserWindow
     ({
@@ -56,6 +71,7 @@ app.on('ready', () => {
         const devicesToDisplay = await scanConnectedDevices(event);
         const userSettings = readUserSettings(event);
         ProgramState.restoreFieldsContents(userSettings);
+        await scanProperties(event, userSettings);
         if (ProgramState.getPackagesPath()) {
             const packagesAbsPath = ProgramState.getPackagesPath();
             const [apkToDisplay, obbToDisplay] = await scanPackagesDirectory(packagesAbsPath); 
@@ -127,10 +143,10 @@ ipcMain.on('clear-app-logs', (event, deviceId) => {
     cmdController.clearLogs(event, utils.wrapDeviceID(deviceId));
 });
 
-ipcMain.on('property-name-change', async (event, deviceId, propName, fieldId) => {
-    ProgramState.setPropertyName(fieldId, propName);
+ipcMain.on('property-name-change', async (event, deviceId, propName, propNameField) => {
+    ProgramState.setPropertyName(propNameField, propName);
     const propValue = await cmdController.getProp(event, utils.wrapDeviceID(deviceId), propName);
-    event.sender.send('display-prop-value', propValue, settings.propertyFields[fieldId]);
+    event.sender.send('display-prop-value', propValue, ProgramState.getPropValueFieldByName(propNameField));
 });
 
 ipcMain.on('property-value-change', (event, deviceId, propValue, propName) => {
