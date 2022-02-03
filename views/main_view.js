@@ -115,9 +115,9 @@ Array.from(document.getElementsByClassName('feature-control_group_property-name'
             if (event.target.value.length > 0)
             {
                 ipcRenderer.send('property-name-change',
-                utils.getInput('device-id-select'),
-                event.target.value,
-                event.target.id);
+                    utils.getInput('device-id-select'),
+                    event.target.value,
+                    event.target.id);
             }
         });
     });
@@ -131,7 +131,13 @@ Array.from(document.getElementsByClassName('feature-control_group_property-value
             utils.getInput(propNameFieldId))
     }));
 
-/** return to ipcMain */
+/** ipcMain channel handlers */
+
+ipcRenderer.on('restore-user-settings', (e, fieldsContents) => {
+    Object.keys(fieldsContents).forEach(key => {
+        document.getElementById(key).value = fieldsContents[key];
+    });
+});
 
 ipcRenderer.on('display-packages', (e, apkToDisplay, obbToDisplay) => {
     document.getElementById('apk-filename').innerHTML = "";

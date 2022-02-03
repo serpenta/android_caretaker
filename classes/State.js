@@ -1,18 +1,18 @@
 class ProgramState
 {
     static settings = {
+        deviceId: null,
         general: {
-            activeDevice: null,
-            packageName: null,
-            logsTargetPath: null,
-            logsTargetName: null,
-            packagesPath: null,
+            'package-name': null,
+            'logs-target-path': null,
+            'logs-target-name': null,
+            'packages-abs-path': null,
             'property-name_1': null,
             'property-name_2': null,
             'property-name_3': null,
-            'property-name-4': null,
+            'property-name_4': null,
             'property-name_5': null,
-            'property-name-6': null,
+            'property-name_6': null,
             'property-name_7': null,
             'property-name_8': null,
             'property-name_9': null
@@ -30,62 +30,62 @@ class ProgramState
     static tenSecVals = [];
 
     static getActiveDevice() {
-        return this.settings.general.activeDevice;
+        return this.settings.deviceId;
     }
 
     static setActiveDevice(value) {
         if (typeof value !== 'string')
             return -1;
         else
-            this.settings.general.activeDevice = value;
+            this.settings.deviceId = value;
             return null;
     }
 
     static getPackageName() {
-        return this.settings.general.packageName;
+        return this.settings.general['package-name'];
     }
 
     static setPackageName(value) {
         if (typeof value !== 'string')
             return -1;
         else
-            this.settings.general.packageName = value;
+            this.settings.general['package-name'] = value;
             return null;
     }
 
     static getLogsTargetPath() {
-        return this.settings.general.logsTargetPath;
+        return this.settings.general['logs-target-path'];
     }
 
     static setLogsTargetPath(value) {
         if (typeof value !== 'string')
             return -1;
         else
-            this.settings.general.logsTargetPath = value;
+            this.settings.general['logs-target-path'] = value;
             return null;
     }
 
     static getLogsTargetName() {
-        return this.settings.general.logsTargetName;
+        return this.settings.general['logs-target-name'];
     }
 
     static setLogsTargetName(value) {
         if (typeof value !== 'string')
             return -1;
         else
-            this.settings.general.logsTargetName = value;
+            this.settings.general['logs-target-name'] = value;
             return null;
     }
 
     static getPackagesPath() {
-        return this.settings.general.packagesPath;
+        return this.settings.general['packages-abs-path'];
     }
 
     static setPackagesPath(value) {
         if (typeof value !== 'string')
             return -1;
         else
-            this.settings.general.packagesPath = value
+            this.settings.general['packages-abs-path'] = value
             return null;
     }
 
@@ -103,6 +103,15 @@ class ProgramState
 
     static getFieldsContents() {
         return this.settings.general;
+    }
+
+    static restoreFieldsContents(contents) {
+        if (typeof contents !== 'object')
+            return -1;
+        else
+            Object.keys(contents).forEach(key => {
+                this.settings.general[key] = contents[key];
+            });
     }
 
     static getMeasurePss() {

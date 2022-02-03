@@ -1,5 +1,6 @@
 const { app, ipcMain, BrowserWindow, ipcRenderer } = require('electron');
-const filesys = require('fs')
+const filesys = require('fs');
+const path = require('path');
 
 const settings = require('./common/settings');
 const utils = require('./common/utilities');
@@ -7,6 +8,14 @@ const cmdController = require('./controllers/cmd_ctrl');
 const { ProgramState } = require('./classes/State');
 
 ProgramState.init();
+
+function readUserSettings (event) {
+    try { return JSON.parse(filesys.readFileSync(path.resolve(`./UserSettings.json`), 'utf-8')); }
+    catch(error) { 
+        console.log(error);
+        event.sender.send('app-log-print', '[main]: No user settings file found!');
+    }
+}
 
 app.on('ready', () => {
     let winMain = new BrowserWindow
@@ -26,8 +35,11 @@ app.on('ready', () => {
             devicesToDisplay.push(`<option value="${device}">${device}</option>`);
             ProgramState.pushDeviceID(device);
         });
+        const userSettings = readUserSettings(event);
+        ProgramState.restoreFieldsContents(userSettings);
         event.sender.send('display-conn-devices', devicesToDisplay);
-        event.sender.send('app-log-print', '[mainWindow]: App loaded!');
+        event.sender.send('app-log-print', '[main]: App loaded!');
+        event.sender.send('restore-user-settings', ProgramState.getFieldsContents());
     });
 
     winMain.on('closed', () => {
