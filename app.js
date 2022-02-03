@@ -1,10 +1,21 @@
 const { app, ipcMain, BrowserWindow, ipcRenderer } = require('electron');
+const filesys = require('fs');
+const path = require('path');
+
 const settings = require('./common/settings');
 const utils = require('./common/utilities');
 const cmdController = require('./controllers/cmd_ctrl');
 const { ProgramState } = require('./classes/State');
 
 ProgramState.init();
+
+function readUserSettings (event) {
+    try { return JSON.parse(filesys.readFileSync(path.resolve(`./UserSettings.json`), 'utf-8')); }
+    catch(error) { 
+        console.log(error);
+        event.sender.send('app-log-print', '[main]: No user settings file found!');
+    }
+}
 
 app.on('ready', () => {
     let winMain = new BrowserWindow
@@ -24,11 +35,17 @@ app.on('ready', () => {
             devicesToDisplay.push(`<option value="${device}">${device}</option>`);
             ProgramState.pushDeviceID(device);
         });
+        const userSettings = readUserSettings(event);
+        ProgramState.restoreFieldsContents(userSettings);
         event.sender.send('display-conn-devices', devicesToDisplay);
-        event.sender.send('app-log-print', '[mainWindow]: App loaded!');
+        event.sender.send('app-log-print', '[main]: App loaded!');
+        event.sender.send('restore-user-settings', ProgramState.getFieldsContents());
     });
 
-    winMain.on('closed', () => app.quit());
+    winMain.on('closed', () => {
+        filesys.writeFileSync(`./UserSettings.json`, JSON.stringify(ProgramState.getFieldsContents()));
+        app.quit();
+    });
 });
 
 ipcMain.on('open-meminfo', () => {
@@ -54,13 +71,13 @@ ipcMain.on('open-meminfo', () => {
 
 /* MAIN WINDOW RENDERER */
 
-ipcMain.on('scan-dir-packages', async (event, directory) => {
-    const apkList = await cmdController.scanDirectory(directory, ".apk");
+ipcMain.on('scan-dir-packages', async (event, packagesAbsPath) => {
+    const apkList = await cmdController.scanDirectory(packagesAbsPath, ".apk");
     const apkToDisplay = ['<option disabled>- Detected APK -</option>'];
     apkList.forEach(file => {
         apkToDisplay.push(`<option value="${file}">${file}</option>`);
     });
-    const obbList = await cmdController.scanDirectory(directory, ".obb");
+    const obbList = await cmdController.scanDirectory(packagesAbsPath, ".obb");
     const obbToDisplay = ['<option value="">None</option>', '<option disabled>- Detected OBB -</option>'];
     obbList.forEach(file => {
         obbToDisplay.push(`<option value="${file}">${file}</option>`);
@@ -68,9 +85,9 @@ ipcMain.on('scan-dir-packages', async (event, directory) => {
     event.sender.send('display-packages', apkToDisplay, obbToDisplay);
 });
 
-ipcMain.on('install-app', async (event, deviceId, packageName, directory, apkFilename, obbFilename) => {
+ipcMain.on('install-app', async (event, deviceId, packageName, packagesAbsPath, apkFilename, obbFilename) => {
     await cmdController.deleteApp(event, utils.wrapDeviceID(deviceId), packageName);
-    await cmdController.installApp(event, utils.wrapDeviceID(deviceId), directory, apkFilename, obbFilename);
+    await cmdController.installApp(event, utils.wrapDeviceID(deviceId), packagesAbsPath, apkFilename, obbFilename);
 });
 
 ipcMain.on('scan-conn-devices', async (event) => {
@@ -88,8 +105,8 @@ ipcMain.on('print-package-version', async (event, deviceId, packageName) => {
     event.sender.send('print-package-version', versions.versionName, versions.versionCode);
 });
 
-ipcMain.on('save-app-logs', async (event, deviceId, packageName, fileDirectory, fileName, pidSwitch) => {
-    cmdController.dumpLogs(event, utils.wrapDeviceID(deviceId), packageName, fileDirectory, fileName, pidSwitch);
+ipcMain.on('save-app-logs', async (event, deviceId, packageName, targetPath, fileName, pidSwitch) => {
+    cmdController.dumpLogs(event, utils.wrapDeviceID(deviceId), packageName, targetPath, fileName, pidSwitch);
 });
 
 ipcMain.on('open-logcat', (event, deviceId, packageName, pidSwitch) => {
@@ -101,6 +118,7 @@ ipcMain.on('clear-app-logs', (event, deviceId) => {
 });
 
 ipcMain.on('property-name-change', async (event, deviceId, propName, fieldId) => {
+    ProgramState.setPropertyName(fieldId, propName);
     const propValue = await cmdController.getProp(event, utils.wrapDeviceID(deviceId), propName);
     event.sender.send('display-prop-value', propValue, settings.propertyFields[fieldId]);
 });
@@ -109,15 +127,27 @@ ipcMain.on('property-value-change', (event, deviceId, propValue, propName) => {
     cmdController.setProp(event, utils.wrapDeviceID(deviceId), propName, propValue);
 });
 
-ipcMain.on('progstat-change-active-device', (event, deviceId) => {
+ipcMain.on('change-active-device', (event, deviceId) => {
     ProgramState.setActiveDevice(deviceId);
 });
 
-ipcMain.on('progstat-change-packagename', async (event, deviceId, packageName) => {
+ipcMain.on('change-packagename', async (event, deviceId, packageName) => {
     ProgramState.setPackageName(packageName);
     const versions = await cmdController.getVersionName(utils.wrapDeviceID(deviceId), packageName);
     event.sender.send('print-package-version', versions.versionName, versions.versionCode);
 });
+
+ipcMain.on('change-logs-target-path', (event, targetPath) => {
+    ProgramState.setLogsTargetPath(targetPath);
+});
+
+ipcMain.on('change-logs-target-name', (event, targetName) => {
+    ProgramState.setLogsTargetName(targetName);
+})
+
+ipcMain.on('change-packages-abs-path', (event, packagesPath) => {
+    ProgramState.setPackagesPath(packagesPath);
+})
 
 /* MEMINFO WINDOW RENDERER */
 
