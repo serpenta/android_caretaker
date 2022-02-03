@@ -28,7 +28,9 @@ app.on('ready', () => {
         event.sender.send('app-log-print', '[mainWindow]: App loaded!');
     });
 
-    winMain.on('closed', () => app.quit());
+    winMain.on('closed', () => {
+        app.quit()
+    });
 });
 
 ipcMain.on('open-meminfo', () => {
@@ -54,13 +56,13 @@ ipcMain.on('open-meminfo', () => {
 
 /* MAIN WINDOW RENDERER */
 
-ipcMain.on('scan-dir-packages', async (event, directory) => {
-    const apkList = await cmdController.scanDirectory(directory, ".apk");
+ipcMain.on('scan-dir-packages', async (event, packagesAbsPath) => {
+    const apkList = await cmdController.scanDirectory(packagesAbsPath, ".apk");
     const apkToDisplay = ['<option disabled>- Detected APK -</option>'];
     apkList.forEach(file => {
         apkToDisplay.push(`<option value="${file}">${file}</option>`);
     });
-    const obbList = await cmdController.scanDirectory(directory, ".obb");
+    const obbList = await cmdController.scanDirectory(packagesAbsPath, ".obb");
     const obbToDisplay = ['<option value="">None</option>', '<option disabled>- Detected OBB -</option>'];
     obbList.forEach(file => {
         obbToDisplay.push(`<option value="${file}">${file}</option>`);
@@ -68,9 +70,9 @@ ipcMain.on('scan-dir-packages', async (event, directory) => {
     event.sender.send('display-packages', apkToDisplay, obbToDisplay);
 });
 
-ipcMain.on('install-app', async (event, deviceId, packageName, directory, apkFilename, obbFilename) => {
+ipcMain.on('install-app', async (event, deviceId, packageName, packagesAbsPath, apkFilename, obbFilename) => {
     await cmdController.deleteApp(event, utils.wrapDeviceID(deviceId), packageName);
-    await cmdController.installApp(event, utils.wrapDeviceID(deviceId), directory, apkFilename, obbFilename);
+    await cmdController.installApp(event, utils.wrapDeviceID(deviceId), packagesAbsPath, apkFilename, obbFilename);
 });
 
 ipcMain.on('scan-conn-devices', async (event) => {
@@ -88,8 +90,8 @@ ipcMain.on('print-package-version', async (event, deviceId, packageName) => {
     event.sender.send('print-package-version', versions.versionName, versions.versionCode);
 });
 
-ipcMain.on('save-app-logs', async (event, deviceId, packageName, fileDirectory, fileName, pidSwitch) => {
-    cmdController.dumpLogs(event, utils.wrapDeviceID(deviceId), packageName, fileDirectory, fileName, pidSwitch);
+ipcMain.on('save-app-logs', async (event, deviceId, packageName, targetPath, fileName, pidSwitch) => {
+    cmdController.dumpLogs(event, utils.wrapDeviceID(deviceId), packageName, targetPath, fileName, pidSwitch);
 });
 
 ipcMain.on('open-logcat', (event, deviceId, packageName, pidSwitch) => {
@@ -109,15 +111,27 @@ ipcMain.on('property-value-change', (event, deviceId, propValue, propName) => {
     cmdController.setProp(event, utils.wrapDeviceID(deviceId), propName, propValue);
 });
 
-ipcMain.on('progstat-change-active-device', (event, deviceId) => {
+ipcMain.on('change-active-device', (event, deviceId) => {
     ProgramState.setActiveDevice(deviceId);
 });
 
-ipcMain.on('progstat-change-packagename', async (event, deviceId, packageName) => {
+ipcMain.on('change-packagename', async (event, deviceId, packageName) => {
     ProgramState.setPackageName(packageName);
     const versions = await cmdController.getVersionName(utils.wrapDeviceID(deviceId), packageName);
     event.sender.send('print-package-version', versions.versionName, versions.versionCode);
 });
+
+ipcMain.on('change-logs-target-path', (event, targetPath) => {
+    ProgramState.setLogsTargetPath(targetPath);
+});
+
+ipcMain.on('change-logs-target-name', (event, targetName) => {
+    ProgramState.setLogsTargetName(targetName);
+})
+
+ipcMain.on('change-packages-abs-path', (event, packagesPath) => {
+    ProgramState.setPackagesPath(packagesPath);
+})
 
 /* MEMINFO WINDOW RENDERER */
 

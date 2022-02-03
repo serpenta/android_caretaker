@@ -168,25 +168,25 @@ async function fetchPid(event, deviceId, packageName)
     return pid;
 }
 
-async function dumpLogs (event, deviceId, packageName, fileDirectory, fileName, pidSwitch)
+async function dumpLogs (event, deviceId, packageName, targetPath, targetName, pidSwitch)
 {
     const pid = pidSwitch ? await fetchPid(event, deviceId, packageName) : null;
-    const fileDirSafe = fileDirectory.length > 1 ? fileDirectory : "./logs/";
+    const targetPathSafe = targetPath.length > 1 ? targetPath : "./logs/";
     
-    let fileNameSafe = null;
-    if (fileName.length > 0)
-        fileNameSafe = fileName.slice(fileName.length-4).match(/(\.[a-z]{3}$)/) === null ? fileName+".txt" : fileName;
+    let targetNameSafe = null;
+    if (targetName.length > 0)
+        targetNameSafe = targetName.slice(targetName.length-4).match(/(\.[a-z]{3}$)/) === null ? targetName+".txt" : targetName;
     else
-        fileNameSafe = `log_${packageName}_${utils.timeStampFile()}.txt`;
+        targetNameSafe = `log_${packageName}_${utils.timeStampFile()}.txt`;
 
     if (pid !== null)
-        await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${fileNameSafe} --pid=${pid}`);
+        await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${targetNameSafe} --pid=${pid}`);
     else
-        await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${fileNameSafe}`);
+        await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${targetNameSafe}`);
 
-    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileNameSafe}\' dumped at /sdcard/Download`);
-    runCmd(`adb ${deviceId} pull "/sdcard/Download/${fileNameSafe}" "${fileDirSafe}${fileNameSafe}"`)
-    event.sender.send('app-log-print', `[dumpLogs]: log \'${fileNameSafe}\' pulled to ${fileDirSafe}`);
+    event.sender.send('app-log-print', `[dumpLogs]: log \'${targetNameSafe}\' dumped at /sdcard/Download`);
+    runCmd(`adb ${deviceId} pull "/sdcard/Download/${targetNameSafe}" "${targetPathSafe}${targetNameSafe}"`)
+    event.sender.send('app-log-print', `[dumpLogs]: log \'${targetNameSafe}\' pulled to ${targetPathSafe}`);
     return null;
 }
 

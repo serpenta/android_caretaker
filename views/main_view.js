@@ -2,10 +2,12 @@ const { ipcRenderer } = require('electron');
 const settings = require('../common/settings');
 const utils = require('../common/utilities');
 
+/** on click */
+
 document.getElementById('btn_scan-dir-packages')
     .addEventListener('click', () => {
         ipcRenderer.send('scan-dir-packages',
-            utils.getAbsFilepath('file-abs-path'));
+            utils.getAbsFilepath('packages-abs-path'));
     });
 
 document.getElementById('btn_install-app')
@@ -13,7 +15,7 @@ document.getElementById('btn_install-app')
         ipcRenderer.send('install-app',
             utils.getInput('device-id-select'),
             utils.getInput('package-name'),
-            utils.getAbsFilepath('file-abs-path'),
+            utils.getAbsFilepath('packages-abs-path'),
             utils.getInput('apk-filename'),
             utils.getInput('obb-filename'));
     });
@@ -21,13 +23,6 @@ document.getElementById('btn_install-app')
 document.getElementById('btn_scan-conn-devices')
     .addEventListener('click', () => {
         ipcRenderer.send('scan-conn-devices');
-    });
-
-document.getElementById('package-name')
-    .addEventListener('change', () => {
-        ipcRenderer.send('progstat-change-packagename',
-            utils.getInput('device-id-select'),
-            utils.getInput('package-name'));
     });
 
 document.getElementById('btn_print-package-version')
@@ -42,7 +37,7 @@ document.getElementById('btn_save-logs')
         ipcRenderer.send('save-app-logs',
             utils.getInput('device-id-select'),
             utils.getInput('package-name'),
-            utils.getAbsFilepath('logs-target-directory'),
+            utils.getAbsFilepath('logs-target-path'),
             utils.getInput('logs-target-name'),
             utils.getCheckbox('logs-pid-filter'));
     });
@@ -66,6 +61,8 @@ document.getElementById('btn_open-meminfo')
         ipcRenderer.send('open-meminfo');
     });
 
+/** on change */
+
 document.getElementById('device-id-select')
     .addEventListener('change', () => {
         Array.from(document.getElementsByClassName('feature-control_group_property-name'))
@@ -78,10 +75,35 @@ document.getElementById('device-id-select')
                     element.id);
                 }
             });
-        ipcRenderer.send('progstat-change-active-device',
+        ipcRenderer.send('change-active-device',
             utils.getInput('device-id-select'));
     });
-    
+
+document.getElementById('package-name')
+    .addEventListener('change', () => {
+        ipcRenderer.send('change-packagename',
+            utils.getInput('device-id-select'),
+            utils.getInput('package-name'));
+    });
+
+document.getElementById('logs-target-path')
+    .addEventListener('change', () => {
+        ipcRenderer.send('change-logs-target-path',
+            utils.getInput('logs-target-path'));
+    });
+
+document.getElementById('logs-target-name')
+    .addEventListener('change', () => {
+        ipcRenderer.send('change-logs-target-name',
+            utils.getInput('logs-target-name'));
+    });
+
+document.getElementById('packages-abs-path')
+    .addEventListener('change', () => {
+        ipcRenderer.send('change-packages-abs-path',
+            utils.getInput('packages-abs-path'));
+    });
+
 Array.from(document.getElementsByClassName('feature-control_group_property-name'))
     .forEach(element => {
         element.addEventListener('change', (event) => {
@@ -108,6 +130,8 @@ Array.from(document.getElementsByClassName('feature-control_group_property-value
             event.target.value,
             utils.getInput(propNameFieldId))
     }));
+
+/** return to ipcMain */
 
 ipcRenderer.on('display-packages', (e, apkToDisplay, obbToDisplay) => {
     document.getElementById('apk-filename').innerHTML = "";

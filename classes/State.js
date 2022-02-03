@@ -4,6 +4,18 @@ class ProgramState
         general: {
             activeDevice: null,
             packageName: null,
+            logsTargetPath: null,
+            logsTargetName: null,
+            packagesPath: null,
+            propertyName_1: null,
+            propertyName_2: null,
+            propertyName_3: null,
+            propertyName_4: null,
+            propertyName_5: null,
+            propertyName_6: null,
+            propertyName_7: null,
+            propertyName_8: null,
+            propertyName_9: null
         },
         meminfo: {
             measurePss: false,
@@ -38,6 +50,42 @@ class ProgramState
             return -1;
         else
             this.settings.general.packageName = value;
+            return null;
+    }
+
+    static getLogsTargetPath() {
+        return this.settings.general.logsTargetPath;
+    }
+
+    static setLogsTargetPath(value) {
+        if (typeof value !== 'string')
+            return -1;
+        else
+            this.settings.general.logsTargetPath = value;
+            return null;
+    }
+
+    static getLogsTargetName() {
+        return this.settings.general.logsTargetName;
+    }
+
+    static setLogsTargetName(value) {
+        if (typeof value !== 'string')
+            return -1;
+        else
+            this.settings.general.logsTargetName = value;
+            return null;
+    }
+
+    static getPackagesPath() {
+        return this.settings.general.packagesPath;
+    }
+
+    static setPackagesPath(value) {
+        if (typeof value !== 'string')
+            return -1;
+        else
+            this.settings.general.packagesPath = value
             return null;
     }
 
