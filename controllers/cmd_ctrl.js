@@ -1,4 +1,5 @@
 const childProcess = require('child_process');
+const path = require('path');
 // const { pid } = require('process');
 const utils = require('../common/utilities');
 const { ProgramState } = require('../classes/State');
@@ -177,7 +178,7 @@ async function fetchPid(event, deviceId, packageName)
 async function dumpLogs (event, deviceId, packageName, targetPath, targetName, pidSwitch)
 {
     const pid = pidSwitch ? await fetchPid(event, deviceId, packageName) : null;
-    const targetPathSafe = targetPath.length > 1 ? targetPath : "./logs/";
+    const targetPathSafe = targetPath.length > 1 ? targetPath : path.resolve('./logs/')+'\\';
     
     let targetNameSafe = null;
     if (targetName.length > 0)
@@ -193,7 +194,8 @@ async function dumpLogs (event, deviceId, packageName, targetPath, targetName, p
         await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${targetNameSafe}`);
 
     event.sender.send('app-log-print', `[dumpLogs]: log \'${targetNameSafe}\' dumped at /sdcard/Download`);
-    runCmd(`adb ${deviceId} pull "/sdcard/Download/${targetNameSafe}" "${targetPathSafe}${targetNameSafe}"`)
+    runCmd(`if not exist ${targetPathSafe} mkdir ${targetPathSafe}`);
+    runCmd(`adb ${deviceId} pull "/sdcard/Download/${targetNameSafe}" "${targetPathSafe}${targetNameSafe}"`);
     event.sender.send('app-log-print', `[dumpLogs]: log \'${targetNameSafe}\' pulled to ${targetPathSafe}`);
     return null;
 }
