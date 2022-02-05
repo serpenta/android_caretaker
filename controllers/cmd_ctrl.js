@@ -193,10 +193,10 @@ async function dumpLogs (event, deviceId, packageName, targetPath, targetName, p
     else
         await runCmd(`adb ${deviceId} logcat -d -f /sdcard/Download/${targetNameSafe}`);
 
-    event.sender.send('app-log-print', `[dumpLogs]: log \'${targetNameSafe}\' dumped at /sdcard/Download`);
+    utils.appLog(event, `[dumpLogs]: log \'${targetNameSafe}\' dumped at /sdcard/Download`);
     runCmd(`if not exist ${targetPathSafe} mkdir ${targetPathSafe}`);
     runCmd(`adb ${deviceId} pull "/sdcard/Download/${targetNameSafe}" "${targetPathSafe}${targetNameSafe}"`);
-    event.sender.send('app-log-print', `[dumpLogs]: log \'${targetNameSafe}\' pulled to ${targetPathSafe}`);
+    utils.appLog(event, `[dumpLogs]: log \'${targetNameSafe}\' pulled to ${targetPathSafe}`);
     return null;
 }
 

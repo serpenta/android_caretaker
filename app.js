@@ -27,9 +27,11 @@ async function scanConnectedDevices (event) {
     return devicesToDisplay;
 }
 
-async function scanPackagesDirectory () {
-    if (ProgramState.getPackagesPath()) {
-        const packagesAbsPath = ProgramState.getPackagesPath();
+async function scanPackagesDirectory (event) {
+    packagesAbsPath = ProgramState.getPackagesPath();
+    if (packagesAbsPath)
+    {
+        utils.appLog(event, `Looking for app packages at ${packagesAbsPath}`)
         const apkList = await cmdController.scanDirectory(packagesAbsPath, ".apk");
         const apkToDisplay = ['<option disabled>- Detected APK -</option>'];
         apkList.forEach(file => {
@@ -40,10 +42,13 @@ async function scanPackagesDirectory () {
         obbList.forEach(file => {
             obbToDisplay.push(`<option value="${file}">${file}</option>`);
         });
+        utils.appLog(event, `Found ${apkList.length} APK files.`);
+        utils.appLog(event, `Found ${obbList.length} OBB files.`);
         return [apkToDisplay, obbToDisplay];
     }
-    else {
-        return -1;
+    else
+    {
+        return [null, null];
     }
 }
 
@@ -75,14 +80,18 @@ app.on('ready', () => {
     winMain.loadFile('./windows/main_window.html');
     winMain.webContents.on('did-finish-load', async (event) => {
         const userSettings = readUserSettings(event);
-        ProgramState.restoreFieldsContents(userSettings);
         const devicesToDisplay = await scanConnectedDevices(event);
-        const [apkToDisplay, obbToDisplay] = await scanPackagesDirectory(); 
-        await scanProperties(event, userSettings);
+        const [apkToDisplay, obbToDisplay] = await scanPackagesDirectory(event);
+        if (userSettings) 
+        {
+            event.sender.send('app-log-print', 'User settings file loaded.');
+            ProgramState.restoreFieldsContents(userSettings);
+            await scanProperties(event, ProgramState.getFieldsContents());
+            event.sender.send('restore-fields-contents', ProgramState.getFieldsContents());
+        }
         event.sender.send('display-packages', apkToDisplay, obbToDisplay);
         event.sender.send('display-conn-devices', devicesToDisplay);
         event.sender.send('app-log-print', '[main]: App loaded!');
-        event.sender.send('restore-fields-contents', ProgramState.getFieldsContents());
     });
 
     winMain.on('closed', () => {
@@ -119,7 +128,7 @@ ipcMain.on('open-folder', (event, folderPath) => {
 });
 
 ipcMain.on('scan-dir-packages', async (event, packagesAbsPath) => {
-    const [apkToDisplay, obbToDisplay] = await scanPackagesDirectory(packagesAbsPath);
+    const [apkToDisplay, obbToDisplay] = await scanPackagesDirectory(event, packagesAbsPath);
     event.sender.send('display-packages', apkToDisplay, obbToDisplay);
 });
 

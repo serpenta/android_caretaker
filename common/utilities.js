@@ -48,6 +48,12 @@ function getAbsFilepath (input)
     return pathSafe;
 }
 
+function appLog (event, message)
+{
+    event.sender.send('app-log-print', message);
+    return null;
+}
+
 module.exports = {
     wrapDeviceID,
     timeStamp,
@@ -56,5 +62,6 @@ module.exports = {
     getRadio,
     getCheckbox,
     getInput,
-    getAbsFilepath
+    getAbsFilepath,
+    appLog
 }
