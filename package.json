@@ -1,7 +1,7 @@
 {
   "name": "andcare",
   "author": "Adrian Rutkiewicz",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "tool do ogarniania urządzeń Android za pomocą komend ADB",
   "repository": "github:serpenta/android_caretaker",
   "license": "MIT",
