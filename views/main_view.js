@@ -12,10 +12,8 @@ document.getElementById('btn_scan-dir-packages')
 
 document.getElementById('btn_open-dir-packages')
     .addEventListener('click', () => {
-        if (document.getElementById('packages-abs-path').value) {
             ipcRenderer.send('open-folder',
                 utils.getInput('packages-abs-path'));
-        }
     });
 
 document.getElementById('btn_install-app')
@@ -42,11 +40,9 @@ document.getElementById('btn_print-package-version')
 
 document.getElementById('btn_open-dir-logs')
     .addEventListener('click', () => {
-        if (document.getElementById('logs-target-path').value) {
             ipcRenderer.send('open-folder',
                 utils.getInput('logs-target-path'));
-        }
-    })
+    });
 
 document.getElementById('btn_save-logs')
     .addEventListener('click', () => {

@@ -124,7 +124,14 @@ ipcMain.on('open-meminfo', () => {
 /* MAIN WINDOW RENDERER */
 
 ipcMain.on('open-folder', (event, folderPath) => {
-    cmdController.openExplorerWindow(folderPath);
+    if (folderPath.length > 0)
+    {
+        cmdController.openExplorerWindow(folderPath);
+    }
+    else
+    {
+        cmdController.openExplorerWindow(path.resolve('./'));
+    }
 });
 
 ipcMain.on('scan-dir-packages', async (event, packagesAbsPath) => {

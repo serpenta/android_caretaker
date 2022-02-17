@@ -22,7 +22,7 @@
     "productName": "Android Caretaker",
     "copyright": "Copyright © 2020 ${author}",
     "directories": {
-      "output": "./build/${version}"
+      "output": "./build/${version}.(7)"
     },
     "win": {
       "target": "msi",
