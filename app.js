@@ -107,7 +107,8 @@ ipcMain.on('open-meminfo', () => {
         width: 900,
         heigth: 1200,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            contextIsolation: false
         }
     });
 
