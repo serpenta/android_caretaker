@@ -12,7 +12,6 @@
     "package": "electron-builder --dir",
     "distribute": "electron-builder"
   },
-  "dependencies": {},
   "devDependencies": {
     "electron": "^17.0.1",
     "electron-builder": "^22.7.0"
