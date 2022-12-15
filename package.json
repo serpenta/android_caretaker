@@ -13,7 +13,7 @@
     "distribute": "electron-builder"
   },
   "devDependencies": {
-    "electron": "^17.0.1",
+    "electron": "^18.3.7",
     "electron-builder": "^22.7.0"
   },
   "build": {
